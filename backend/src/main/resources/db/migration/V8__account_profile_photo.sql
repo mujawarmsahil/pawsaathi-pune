@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN photo_url MEDIUMTEXT NULL AFTER phone;

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="PawSaathi default profile">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8f1e4"/>
+      <stop offset="1" stop-color="#e7ded0"/>
+    </linearGradient>
+    <linearGradient id="figure" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f665c"/>
+      <stop offset="1" stop-color="#173f38"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" fill="url(#bg)"/>
+  <circle cx="34" cy="46" r="54" fill="#eaa15d" opacity=".28"/>
+  <circle cx="225" cy="218" r="64" fill="#8fb8aa" opacity=".28"/>
+  <circle cx="128" cy="98" r="44" fill="url(#figure)"/>
+  <path d="M48 256c4-48 36-78 80-78s76 30 80 78Z" fill="url(#figure)"/>
+  <circle cx="205" cy="54" r="29" fill="#e68a36"/>
+  <g fill="#fff8ec" transform="translate(205 54)">
+    <ellipse cx="-10" cy="-4" rx="4.6" ry="5.8" transform="rotate(-24 -10 -4)"/>
+    <ellipse cx="0" cy="-10" rx="4.6" ry="5.8"/>
+    <ellipse cx="10" cy="-4" rx="4.6" ry="5.8" transform="rotate(24 10 -4)"/>
+    <ellipse cx="7" cy="7" rx="4.8" ry="5.4" transform="rotate(20 7 7)"/>
+    <ellipse cx="-7" cy="7" rx="4.8" ry="5.4" transform="rotate(-20 -7 7)"/>
+    <path d="M-10 13c0-5 4.5-8 10-8s10 3 10 8c0 6-4.5 10-10 10s-10-4-10-10Z"/>
+  </g>
+</svg>

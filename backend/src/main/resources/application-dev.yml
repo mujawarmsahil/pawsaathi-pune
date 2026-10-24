@@ -1,0 +1,16 @@
+app:
+  jwt:
+    access-token-minutes: 15
+    refresh-token-days: 30
+  security:
+    secure-cookies: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true

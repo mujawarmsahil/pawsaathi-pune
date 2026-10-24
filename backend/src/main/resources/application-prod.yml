@@ -1,0 +1,13 @@
+app:
+  security:
+    secure-cookies: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
