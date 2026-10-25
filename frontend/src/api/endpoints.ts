@@ -158,11 +158,11 @@ export const endpoints = {
   admin: {
     overview: () => apiRequest<AdminSummary>('/admin/overview'),
     caretakers: () => apiRequest<CaretakerCandidate[]>('/admin/caretakers'),
-    bookings: () => apiRequest<AdminBookingSummary[]>('/admin/bookings'),
+    bookings: () => apiRequest<AdminBookingSummary[]>('/bookings/admin'),
     caretakerDetail: (id: number) => apiRequest<AdminCaretakerDetail>(`/admin/caretakers/${id}`),
     caretakerBookings: (id: number) =>
-      apiRequest<AdminBookingSummary[]>(`/admin/caretakers/${id}/bookings`),
-    bookingDetail: (id: number) => apiRequest<AdminBookingDetail>(`/admin/bookings/${id}`),
+      apiRequest<AdminBookingSummary[]>(`/bookings/admin/caretakers/${id}`),
+    bookingDetail: (id: number) => apiRequest<AdminBookingDetail>(`/bookings/admin/${id}`),
     updateCaretaker: (id: number, status: string) =>
       apiRequest<void>(`/admin/caretakers/${id}`, {
         method: 'PATCH',
