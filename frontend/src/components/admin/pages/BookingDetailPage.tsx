@@ -12,9 +12,10 @@ import {
 } from '../../../utils';
 import { EmptyState, ErrorState, LoadingState } from '../../common/feedback/FeedbackStates';
 import { ProfileImage } from '../../common/ui/ProfileImage';
+import { RatingStars } from '../../common/ui/RatingStars';
 import { StatusBadge } from '../../common/ui/StatusBadge';
 
-export function AdminBookingDetailPage() {
+export function BookingDetailPage() {
   const { id } = useParams();
   const bookingId = Number(id);
   const bookingDetailQuery = useQuery({
@@ -106,6 +107,11 @@ export function AdminBookingDetailPage() {
                 <div className="admin-booking-person-copy">
                   <b>{bookingDetail.pet.name}</b>
                   <p>{petSummary}</p>
+                  <p>
+                    {bookingDetail.pet.foodNotes
+                      ? `Food: ${bookingDetail.pet.foodNotes}`
+                      : 'No feeding notes provided.'}
+                  </p>
                   <p>{bookingDetail.pet.notes || 'No pet care notes provided.'}</p>
                 </div>
               </div>
@@ -135,9 +141,28 @@ export function AdminBookingDetailPage() {
               </p>
             </section>
             <section className="admin-profile-section">
-              <h2>Booking notes</h2>
+              <h2>Instructions</h2>
               <p>{bookingDetail.notes || 'No notes were added to this booking.'}</p>
             </section>
+            {bookingDetail.status === 'COMPLETED' && bookingDetail.rating != null && (
+              <section className="admin-profile-section">
+                <h2>Customer review</h2>
+                <RatingStars rating={bookingDetail.rating} />
+                {bookingDetail.review?.trim() ? (
+                  <p>"{bookingDetail.review.trim()}"</p>
+                ) : (
+                  <p className="admin-muted">No written review.</p>
+                )}
+              </section>
+            )}
+            {['CANCELLED', 'REJECTED', 'REFUNDED'].includes(bookingDetail.status) && (
+              <section className="admin-profile-section">
+                <h2>
+                  {bookingDetail.status === 'REJECTED' ? 'Decline reason' : 'Cancellation reason'}
+                </h2>
+                <p>{bookingDetail.cancellationReason || 'No cancellation reason recorded.'}</p>
+              </section>
+            )}
           </div>
           <aside className="admin-booking-detail-side">
             <section>

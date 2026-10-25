@@ -9,6 +9,7 @@ import { endpoints } from '../../api/endpoints';
 import { useBookings } from '../../hooks/useBookings';
 import { formatDateTime, formatINR, getBookingDisplayName } from '../../utils';
 import { EmptyState, ErrorState, LoadingState } from '../common/feedback/FeedbackStates';
+import { RatingStars } from '../common/ui/RatingStars';
 import { StatusBadge } from '../common/ui/StatusBadge';
 
 export function BookingDetailPage() {
@@ -56,14 +57,21 @@ export function BookingDetailPage() {
       <h1>{getBookingDisplayName(booking, 'service')}</h1>
       <StatusBadge status={booking.status} />
       <p>
-        {formatDateTime(booking.startsAt)} –{' '}
-        {new Date(booking.endsAt).toLocaleTimeString('en-IN')}
+        {formatDateTime(booking.startsAt)} – {new Date(booking.endsAt).toLocaleTimeString('en-IN')}
       </p>
       <p>
         Pet: {getBookingDisplayName(booking, 'pet')} · Caretaker:{' '}
         {getBookingDisplayName(booking, 'caretaker')}
       </p>
       <p>₹{formatINR(booking.hourlyRate)} per hour</p>
+      {['CANCELLED', 'REJECTED', 'REFUNDED'].includes(booking.status) && (
+        <div className="booking-card-cancellation">
+          <span className="booking-card-popover-label">
+            {booking.status === 'REJECTED' ? 'Decline reason' : 'Cancellation reason'}
+          </span>
+          <p>{booking.cancellationReason?.trim() || 'No cancellation reason recorded.'}</p>
+        </div>
+      )}
       <div className="status-timeline">
         <h2>Booking timeline</h2>
         <ol>
@@ -73,7 +81,18 @@ export function BookingDetailPage() {
           </li>
         </ol>
       </div>
-      {booking.status === 'COMPLETED' && booking.caretakerId && (
+      {booking.status === 'COMPLETED' && booking.rating != null && (
+        <section className="booking-review-panel">
+          <h2>Your review</h2>
+          <RatingStars rating={booking.rating} />
+          {booking.review?.trim() ? (
+            <p>"{booking.review.trim()}"</p>
+          ) : (
+            <p className="admin-muted">No written review.</p>
+          )}
+        </section>
+      )}
+      {booking.status === 'COMPLETED' && booking.caretakerId && booking.rating == null && (
         <form
           className="profile-setup"
           onSubmit={handleSubmit((reviewValues) => {

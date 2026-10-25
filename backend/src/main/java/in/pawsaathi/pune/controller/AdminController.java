@@ -1,7 +1,5 @@
 package in.pawsaathi.pune.controller;
 
-import in.pawsaathi.pune.model.AdminBookingDetailResponse;
-import in.pawsaathi.pune.model.AdminBookingSummaryResponse;
 import in.pawsaathi.pune.model.AdminCaretakerDetailResponse;
 import in.pawsaathi.pune.model.AdminDecisionRequest;
 import in.pawsaathi.pune.model.AdminDecisionResponse;
@@ -47,16 +45,6 @@ public class AdminController {
     @GetMapping("/caretakers/{id}")
     public AdminCaretakerDetailResponse caretaker(@PathVariable long id) {
         return admins.caretakerDetail(id);
-    }
-
-    @GetMapping("/caretakers/{id}/bookings")
-    public List<AdminBookingSummaryResponse> caretakerBookings(@PathVariable long id) {
-        return admins.caretakerBookings(id);
-    }
-
-    @GetMapping("/bookings/{id}")
-    public AdminBookingDetailResponse booking(@PathVariable long id) {
-        return admins.bookingDetail(id);
     }
 
     @PatchMapping("/caretakers/{id}")

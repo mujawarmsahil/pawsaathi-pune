@@ -43,7 +43,10 @@ public class Pet {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
-    @Column(name = "photo_url", length = 500)
+    @Column(name = "food_notes", length = 1000)
+    private String foodNotes;
+
+    @Column(name = "photo_url", columnDefinition = "MEDIUMTEXT")
     private String photoUrl;
 
     @CreationTimestamp
@@ -69,22 +72,34 @@ public class Pet {
             String species,
             String breed,
             BigDecimal ageYears,
-            String notes) {
+            String notes,
+            String foodNotes,
+            String photoUrl) {
         this.owner = owner;
         this.name = name;
         this.species = species;
         this.breed = breed;
         this.ageYears = ageYears;
         this.notes = notes;
+        this.foodNotes = foodNotes;
+        this.photoUrl = photoUrl;
     }
 
     public void update(
-            String name, String species, String breed, BigDecimal ageYears, String notes) {
+            String name,
+            String species,
+            String breed,
+            BigDecimal ageYears,
+            String notes,
+            String foodNotes,
+            String photoUrl) {
         this.name = name;
         this.species = species;
         this.breed = breed;
         this.ageYears = ageYears;
         this.notes = notes;
+        this.foodNotes = foodNotes;
+        this.photoUrl = photoUrl;
     }
 
     public void softDelete(Instant deletedAt) {
@@ -113,6 +128,10 @@ public class Pet {
 
     public String getNotes() {
         return notes;
+    }
+
+    public String getFoodNotes() {
+        return foodNotes;
     }
 
     public String getPhotoUrl() {

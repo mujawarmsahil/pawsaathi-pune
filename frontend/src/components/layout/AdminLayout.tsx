@@ -7,6 +7,7 @@ import { SiteHeader } from './SiteHeader';
 const adminLinks = [
   ['/admin', 'Overview'],
   ['/admin/caretakers', 'Caretakers'],
+  ['/admin/bookings', 'Bookings'],
   ['/admin/reviews', 'Reviews'],
   ['/admin/support', 'Support'],
 ];

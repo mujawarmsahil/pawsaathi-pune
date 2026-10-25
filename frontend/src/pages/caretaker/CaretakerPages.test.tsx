@@ -1,10 +1,27 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { endpoints } from '../../api/endpoints';
-import { CaretakerOnboardingPage } from '../../components/caretaker/CaretakerPages';
+import {
+  CaretakerBookingsPage,
+  CaretakerOnboardingPage,
+} from '../../components/caretaker/CaretakerPages';
+
+function renderBookings() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <CaretakerBookingsPage />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
 
 function renderOnboarding() {
   const queryClient = new QueryClient({
@@ -65,5 +82,56 @@ describe('caretaker onboarding', () => {
       expect.objectContaining({ weekday: 0, startsAt: '09:00', endsAt: '17:00' }),
     ]);
     expect(await screen.findByText(/Your profile and availability are saved/)).toBeInTheDocument();
+  });
+
+  it('requires and sends a reason when declining a booking', async () => {
+    vi.spyOn(endpoints.caretakerSetup, 'profile').mockResolvedValue({
+      id: 1,
+      userId: 9,
+      bio: 'Patient and reliable local pet care.',
+      experienceYears: 3,
+      hourlyRate: 450,
+      serviceAreas: 'Aundh',
+      photoUrl: null,
+      languages: 'English',
+      serviceTypes: '',
+      approvalStatus: 'APPROVED',
+      verified: false,
+    });
+    const booking = {
+      id: 41,
+      customerId: 4,
+      caretakerId: 9,
+      petId: 12,
+      serviceId: 3,
+      status: 'CONFIRMED',
+      startsAt: '2030-02-14T10:00:00Z',
+      endsAt: '2030-02-14T11:30:00Z',
+      hourlyRate: 500,
+      serviceName: 'Pet sitting',
+      petName: 'Bruno',
+      customerName: 'Riya Deshmukh',
+      caretakerName: 'Asha Rao',
+    };
+    vi.spyOn(endpoints.bookings, 'list').mockResolvedValue([booking]);
+    const updateStatus = vi
+      .spyOn(endpoints.bookings, 'updateStatus')
+      .mockResolvedValue({ ...booking, status: 'REJECTED' });
+
+    renderBookings();
+    await userEvent.click(await screen.findByRole('button', { name: 'Decline' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Decline this booking?' });
+    const confirmButton = within(dialog).getByRole('button', { name: 'Decline booking' });
+    expect(confirmButton).toBeDisabled();
+    await userEvent.type(
+      within(dialog).getByLabelText('Reason for declining'),
+      'Schedule conflict',
+    );
+    await userEvent.click(confirmButton);
+
+    await waitFor(() =>
+      expect(updateStatus).toHaveBeenCalledWith(41, 'REJECTED', 'Schedule conflict'),
+    );
   });
 });

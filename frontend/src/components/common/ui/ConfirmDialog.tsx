@@ -1,5 +1,5 @@
 import { ShieldCheck } from 'lucide-react';
-import { useEffect, useId, useRef } from 'react';
+import { type ReactNode, type RefObject, useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 type ConfirmDialogProps = {
@@ -10,6 +10,9 @@ type ConfirmDialogProps = {
   cancelLabel?: string;
   busy?: boolean;
   busyLabel?: string;
+  confirmDisabled?: boolean;
+  initialFocusRef?: RefObject<HTMLElement | null>;
+  children?: ReactNode;
   onConfirm: () => void;
   onCancel: () => void;
 };
@@ -22,6 +25,9 @@ export function ConfirmDialog({
   cancelLabel = 'Cancel',
   busy = false,
   busyLabel = 'Saving…',
+  confirmDisabled = false,
+  initialFocusRef,
+  children,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -42,7 +48,7 @@ export function ConfirmDialog({
     const previousFocus = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    cancelButton.current?.focus();
+    (initialFocusRef?.current ?? cancelButton.current)?.focus();
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape' && !busyRef.current) {
@@ -74,7 +80,7 @@ export function ConfirmDialog({
       document.removeEventListener('keydown', onKeyDown);
       previousFocus?.focus();
     };
-  }, [open]);
+  }, [initialFocusRef, open]);
 
   if (!open) return null;
 
@@ -100,6 +106,7 @@ export function ConfirmDialog({
           <h2 id={titleId}>{title}</h2>
           <p id={descriptionId}>{description}</p>
         </div>
+        {children && <div className="confirm-dialog-fields">{children}</div>}
         <div className="confirm-dialog-actions">
           <button
             ref={cancelButton}
@@ -110,7 +117,12 @@ export function ConfirmDialog({
           >
             {cancelLabel}
           </button>
-          <button type="button" className="button" disabled={busy} onClick={onConfirm}>
+          <button
+            type="button"
+            className="button"
+            disabled={busy || confirmDisabled}
+            onClick={onConfirm}
+          >
             {busy ? busyLabel : confirmLabel}
           </button>
         </div>

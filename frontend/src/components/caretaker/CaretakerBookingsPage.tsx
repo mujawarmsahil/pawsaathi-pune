@@ -1,18 +1,57 @@
 import { useQuery } from '@tanstack/react-query';
-import { CalendarDays } from 'lucide-react';
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 
 import { endpoints } from '../../api/endpoints';
 import { useBookingMutations, useBookings } from '../../hooks/useBookings';
 import type { Booking } from '../../types/api';
-import { formatDateTime, formatINR } from '../../utils';
-import { EmptyState, ErrorState, LoadingState } from '../common/feedback/FeedbackStates';
-import { StatusBadge } from '../common/ui/StatusBadge';
+import { BookingCard, type BookingCardModel } from '../booking/BookingCard';
+import { EmptyState, ErrorState } from '../common/feedback/FeedbackStates';
+import { ReasonDialog } from '../common/ui/ReasonDialog';
+
+function toBookingCardModel(booking: Booking): BookingCardModel {
+  return {
+    id: booking.id,
+    status: booking.status,
+    paymentStatus: booking.paymentStatus,
+    cancellationReason: booking.cancellationReason,
+    rating: booking.rating ?? null,
+    review: booking.review ?? null,
+    startsAt: booking.startsAt,
+    endsAt: booking.endsAt,
+    serviceName: booking.serviceName ?? booking.service_name ?? 'Pet care',
+    pet: {
+      name: booking.petName ?? booking.pet_name ?? 'Pet',
+      photoUrl: booking.petPhotoUrl,
+      species: booking.petSpecies,
+      breed: booking.petBreed,
+      ageYears: booking.petAgeYears,
+      notes: booking.petNotes,
+      foodNotes: booking.petFoodNotes,
+    },
+    owner: {
+      label: 'Owner',
+      name: booking.customerName ?? booking.customer_name ?? 'Customer',
+      email: booking.customerEmail,
+      phone: booking.customerPhone,
+      photoUrl: booking.customerPhotoUrl,
+    },
+    caretaker: {
+      label: 'Caretaker',
+      name: booking.caretakerName ?? booking.caretaker_name ?? 'Caretaker',
+      email: booking.caretakerEmail,
+      phone: booking.caretakerPhone,
+      photoUrl: booking.caretakerPhotoUrl,
+    },
+    hourlyRate: booking.hourlyRate,
+  };
+}
 
 function CaretakerBookingCard({ booking }: { booking: Booking }) {
   const { updateStatus } = useBookingMutations();
   const [bookingStatusError, setBookingStatusError] = useState('');
+  const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
+  const [declineReason, setDeclineReason] = useState('');
   function changeBookingStatus(status: string) {
     updateStatus.mutate(
       { id: booking.id, status },
@@ -20,43 +59,92 @@ function CaretakerBookingCard({ booking }: { booking: Booking }) {
     );
   }
   return (
-    <article className="booking-row">
-      <div className="booking-date">
-        <CalendarDays size={17} />
-      </div>
-      <div className="booking-info">
-        <b>
-          {booking.serviceName ?? booking.service_name ?? 'Pet care'} ·{' '}
-          {booking.petName ?? booking.pet_name ?? 'Pet'}
-        </b>
-        <span>
-          {booking.customerName ?? booking.customer_name ?? 'Customer'} ·{' '}
-          {formatDateTime(booking.startsAt)} · ₹{formatINR(booking.hourlyRate)}/hr
-        </span>
-      </div>
-      <StatusBadge status={booking.status} />
-      {booking.status === 'CONFIRMED' && (
-        <div className="booking-actions">
-          <button disabled={updateStatus.isPending} onClick={() => changeBookingStatus('ACCEPTED')}>
-            Accept
-          </button>
-          <button disabled={updateStatus.isPending} onClick={() => changeBookingStatus('REJECTED')}>
-            Decline
-          </button>
-        </div>
-      )}
-      {booking.status === 'ACCEPTED' && (
-        <button className="button button-small" onClick={() => changeBookingStatus('IN_PROGRESS')}>
-          Start visit
-        </button>
-      )}
-      {booking.status === 'IN_PROGRESS' && (
-        <button className="button button-small" onClick={() => changeBookingStatus('COMPLETED')}>
-          Complete
-        </button>
-      )}
-      {bookingStatusError && <span className="form-error">{bookingStatusError}</span>}
-    </article>
+    <>
+      <BookingCard
+        actions={
+          <>
+            {booking.status === 'CONFIRMED' && (
+              <div className="booking-actions">
+                <button
+                  disabled={updateStatus.isPending}
+                  onClick={() => changeBookingStatus('ACCEPTED')}
+                >
+                  Accept
+                </button>
+                <button
+                  disabled={updateStatus.isPending}
+                  onClick={() => {
+                    setBookingStatusError('');
+                    setDeclineReason('');
+                    setDeclineDialogOpen(true);
+                  }}
+                >
+                  Decline
+                </button>
+              </div>
+            )}
+            {booking.status === 'ACCEPTED' && (
+              <button
+                className="button button-small"
+                disabled={updateStatus.isPending}
+                onClick={() => changeBookingStatus('IN_PROGRESS')}
+              >
+                Start visit
+              </button>
+            )}
+            {booking.status === 'IN_PROGRESS' && (
+              <button
+                className="button button-small"
+                disabled={updateStatus.isPending}
+                onClick={() => changeBookingStatus('COMPLETED')}
+              >
+                Complete
+              </button>
+            )}
+            {bookingStatusError && !declineDialogOpen && (
+              <span className="form-error" role="alert">
+                {bookingStatusError}
+              </span>
+            )}
+          </>
+        }
+        booking={toBookingCardModel(booking)}
+      />
+      <ReasonDialog
+        open={declineDialogOpen}
+        title="Decline this booking?"
+        description="Tell the customer why you cannot take this booking. Your reason will be shared with them and the support team."
+        fieldLabel="Reason for declining"
+        placeholder="Schedule conflict, outside my service area, or another reason"
+        confirmLabel="Decline booking"
+        cancelLabel="Keep booking"
+        reason={declineReason}
+        onReasonChange={setDeclineReason}
+        busy={updateStatus.isPending}
+        error={bookingStatusError}
+        onCancel={() => {
+          if (updateStatus.isPending) return;
+          setDeclineDialogOpen(false);
+          setDeclineReason('');
+          setBookingStatusError('');
+        }}
+        onConfirm={() => {
+          const reason = declineReason.trim();
+          if (!reason) return;
+          setBookingStatusError('');
+          updateStatus.mutate(
+            { id: booking.id, status: 'REJECTED', reason },
+            {
+              onSuccess: () => {
+                setDeclineDialogOpen(false);
+                setDeclineReason('');
+              },
+              onError: (cause) => setBookingStatusError(cause.message),
+            },
+          );
+        }}
+      />
+    </>
   );
 }
 
@@ -66,8 +154,6 @@ export function CaretakerBookingsPage() {
     queryKey: ['caretaker', 'profile'],
     queryFn: endpoints.caretakerSetup.profile,
   });
-  if (bookingsQuery.isPending || caretakerProfileQuery.isPending)
-    return <LoadingState label="Loading your caretaker dashboard…" />;
   if (bookingsQuery.isError)
     return (
       <ErrorState
@@ -82,8 +168,10 @@ export function CaretakerBookingsPage() {
         onRetry={() => void caretakerProfileQuery.refetch()}
       />
     );
-  if (!caretakerProfileQuery.data.bio?.trim())
+  if (!caretakerProfileQuery.isPending && !caretakerProfileQuery.data.bio?.trim())
     return <Navigate to="/caretaker/onboarding" replace />;
+  const bookings = bookingsQuery.data ?? [];
+  const isLoading = bookingsQuery.isPending || caretakerProfileQuery.isPending;
   return (
     <>
       <div className="dashboard-heading">
@@ -96,7 +184,18 @@ export function CaretakerBookingsPage() {
           Profile & availability
         </Link>
       </div>
-      {bookingsQuery.data.length === 0 ? (
+      {isLoading ? (
+        <div
+          className="booking-card-grid"
+          role="status"
+          aria-label="Loading your caretaker dashboard"
+          aria-busy="true"
+        >
+          {['first', 'second', 'third'].map((key) => (
+            <BookingCard isLoading key={key} />
+          ))}
+        </div>
+      ) : bookings.length === 0 ? (
         <EmptyState
           title="No bookings yet"
           message="Complete your caretaker profile and set availability so local pet parents can find you."
@@ -107,8 +206,8 @@ export function CaretakerBookingsPage() {
           }
         />
       ) : (
-        <div className="booking-list">
-          {bookingsQuery.data.map((booking) => (
+        <div className="booking-card-grid" role="list">
+          {bookings.map((booking) => (
             <CaretakerBookingCard key={booking.id} booking={booking} />
           ))}
         </div>

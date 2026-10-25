@@ -53,6 +53,9 @@ public class Booking {
     @Column(nullable = false, length = 30)
     private BookingStatus status;
 
+    @Column(name = "cancellation_reason", length = 500)
+    private String cancellationReason;
+
     @Column(name = "hourly_rate", nullable = false, precision = 10, scale = 2)
     private BigDecimal hourlyRate;
 
@@ -102,6 +105,13 @@ public class Booking {
         this.status = status;
     }
 
+    public void transitionTo(BookingStatus status, String cancellationReason) {
+        this.status = status;
+        if (status == BookingStatus.CANCELLED || status == BookingStatus.REJECTED) {
+            this.cancellationReason = cancellationReason;
+        }
+    }
+
     public Long getId() {
         return id;
     }
@@ -132,6 +142,10 @@ public class Booking {
 
     public BookingStatus getStatus() {
         return status;
+    }
+
+    public String getCancellationReason() {
+        return cancellationReason;
     }
 
     public BigDecimal getHourlyRate() {

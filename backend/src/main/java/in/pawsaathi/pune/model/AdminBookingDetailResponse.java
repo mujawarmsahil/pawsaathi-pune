@@ -16,6 +16,9 @@ public record AdminBookingDetailResponse(
         BigDecimal totalAmount,
         String location,
         String notes,
+        String cancellationReason,
+        Integer rating,
+        String review,
         Instant createdAt,
         String serviceName,
         String serviceDescription,
@@ -35,6 +38,7 @@ public record AdminBookingDetailResponse(
             String breed,
             BigDecimal ageYears,
             String notes,
+            String foodNotes,
             String photoUrl) {}
 
     public record PaymentDetails(String status, BigDecimal amount, String currency) {}

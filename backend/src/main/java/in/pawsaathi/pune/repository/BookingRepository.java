@@ -21,6 +21,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByCaretakerIdOrderByStartsAtDesc(long caretakerId);
 
+    List<Booking> findAllByOrderByStartsAtDesc();
+
     List<Booking> findAllByOrderByCreatedAtDesc();
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
