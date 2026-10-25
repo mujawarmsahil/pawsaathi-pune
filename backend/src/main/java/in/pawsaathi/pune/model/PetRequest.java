@@ -12,4 +12,6 @@ public record PetRequest(
         @NotBlank @Size(max = 40) String species,
         @Size(max = 80) String breed,
         @DecimalMin("0.0") @DecimalMax("40.0") BigDecimal ageYears,
-        @Size(max = 2000) String notes) {}
+        @Size(max = 2000) String notes,
+        @Size(max = 1000) String foodNotes,
+        @Size(max = 3_000_000) String photoUrl) {}

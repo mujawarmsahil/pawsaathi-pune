@@ -6,7 +6,9 @@ import in.pawsaathi.pune.entity.AuditLog;
 import in.pawsaathi.pune.entity.Booking;
 import in.pawsaathi.pune.entity.CaretakerProfile;
 import in.pawsaathi.pune.entity.Payment;
+import in.pawsaathi.pune.entity.PaymentStatus;
 import in.pawsaathi.pune.entity.Pet;
+import in.pawsaathi.pune.entity.Review;
 import in.pawsaathi.pune.entity.ServiceCatalogItem;
 import in.pawsaathi.pune.entity.SupportTicketStatus;
 import in.pawsaathi.pune.exception.BadRequestException;
@@ -24,6 +26,7 @@ import in.pawsaathi.pune.repository.CaretakerProfileRepository;
 import in.pawsaathi.pune.repository.CaretakerQueryRepository;
 import in.pawsaathi.pune.repository.PaymentRepository;
 import in.pawsaathi.pune.repository.RefreshTokenRepository;
+import in.pawsaathi.pune.repository.ReviewRepository;
 import in.pawsaathi.pune.repository.SupportTicketRepository;
 import in.pawsaathi.pune.repository.UserRepository;
 
@@ -35,7 +38,9 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -49,6 +54,7 @@ public class AdminServiceImpl implements AdminService {
     private final CaretakerQueryRepository caretakerQueries;
     private final BookingRepository bookings;
     private final PaymentRepository payments;
+    private final ReviewRepository reviews;
     private final SupportTicketRepository tickets;
     private final AdminActionRepository adminActions;
     private final AuditLogRepository auditLogs;
@@ -60,6 +66,7 @@ public class AdminServiceImpl implements AdminService {
             CaretakerQueryRepository caretakerQueries,
             BookingRepository bookings,
             PaymentRepository payments,
+            ReviewRepository reviews,
             SupportTicketRepository tickets,
             AdminActionRepository adminActions,
             AuditLogRepository auditLogs,
@@ -69,6 +76,7 @@ public class AdminServiceImpl implements AdminService {
         this.caretakerQueries = caretakerQueries;
         this.bookings = bookings;
         this.payments = payments;
+        this.reviews = reviews;
         this.tickets = tickets;
         this.adminActions = adminActions;
         this.auditLogs = auditLogs;
@@ -102,6 +110,12 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<AdminBookingSummaryResponse> bookings() {
+        return summaries(bookings.findAllByOrderByStartsAtDesc());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<AdminBookingSummaryResponse> caretakerBookings(long caretakerId) {
         CaretakerProfile profile =
                 profiles
@@ -111,9 +125,7 @@ public class AdminServiceImpl implements AdminService {
             throw new BadRequestException(
                     "Booking history is only available for approved or suspended caretakers.");
         }
-        return bookings.findByCaretakerIdOrderByStartsAtDesc(caretakerId).stream()
-                .map(this::bookingSummary)
-                .toList();
+        return summaries(bookings.findByCaretakerIdOrderByStartsAtDesc(caretakerId));
     }
 
     @Override
@@ -123,6 +135,7 @@ public class AdminServiceImpl implements AdminService {
                 bookings.findById(bookingId)
                         .orElseThrow(() -> new NotFoundException("Booking not found."));
         Payment payment = payments.findByBookingId(bookingId).orElse(null);
+        Review review = reviews.findByBookingId(bookingId).orElse(null);
         AppUser customer = booking.getCustomer();
         AppUser caretaker = booking.getCaretaker();
         Pet pet = booking.getPet();
@@ -138,6 +151,9 @@ public class AdminServiceImpl implements AdminService {
                 bookingTotal(booking, durationMinutes),
                 booking.getLocation(),
                 booking.getNotes(),
+                booking.getCancellationReason(),
+                review == null ? null : review.getRating(),
+                review == null ? null : review.getComment(),
                 booking.getCreatedAt(),
                 service.getName(),
                 service.getDescription(),
@@ -155,6 +171,7 @@ public class AdminServiceImpl implements AdminService {
                         pet.getBreed(),
                         pet.getAgeYears(),
                         pet.getNotes(),
+                        pet.getFoodNotes(),
                         pet.getPhotoUrl()),
                 payment == null
                         ? null
@@ -195,11 +212,51 @@ public class AdminServiceImpl implements AdminService {
         return new AdminDecisionResponse(caretakerId, decision);
     }
 
-    private AdminBookingSummaryResponse bookingSummary(Booking booking) {
+    private List<AdminBookingSummaryResponse> summaries(List<Booking> bookingList) {
+        Map<Long, PaymentStatus> paymentStatuses = paymentStatuses(bookingList);
+        Map<Long, Review> reviewsByBooking = reviewsByBookingId(bookingList);
+        return bookingList.stream()
+                .map(
+                        booking ->
+                                bookingSummary(
+                                        booking,
+                                        displayPaymentStatus(
+                                                booking, paymentStatuses.get(booking.getId())),
+                                        reviewsByBooking.get(booking.getId())))
+                .toList();
+    }
+
+    private Map<Long, Review> reviewsByBookingId(List<Booking> bookingList) {
+        List<Long> bookingIds = bookingList.stream().map(Booking::getId).toList();
+        if (bookingIds.isEmpty()) return Map.of();
+        return reviews.findByBookingIdIn(bookingIds).stream()
+                .collect(Collectors.toMap(review -> review.getBooking().getId(), review -> review));
+    }
+
+    private Map<Long, PaymentStatus> paymentStatuses(List<Booking> bookingList) {
+        List<Long> bookingIds = bookingList.stream().map(Booking::getId).toList();
+        if (bookingIds.isEmpty()) return Map.of();
+        return payments.findByBookingIdIn(bookingIds).stream()
+                .collect(
+                        Collectors.toMap(
+                                payment -> payment.getBooking().getId(), Payment::getStatus));
+    }
+
+    private PaymentStatus displayPaymentStatus(Booking booking, PaymentStatus paymentStatus) {
+        if (!booking.getStatus().requiresPayment()) return null;
+        return paymentStatus == null ? PaymentStatus.PENDING : paymentStatus;
+    }
+
+    private AdminBookingSummaryResponse bookingSummary(
+            Booking booking, PaymentStatus paymentStatus, Review review) {
         long durationMinutes = durationMinutes(booking);
         return new AdminBookingSummaryResponse(
                 booking.getId(),
                 booking.getStatus(),
+                paymentStatus,
+                booking.getCancellationReason(),
+                review == null ? null : review.getRating(),
+                review == null ? null : review.getComment(),
                 booking.getStartsAt(),
                 booking.getEndsAt(),
                 durationMinutes,
@@ -208,6 +265,19 @@ public class AdminServiceImpl implements AdminService {
                 booking.getService().getName(),
                 booking.getPet().getName(),
                 booking.getCustomer().getName(),
+                booking.getCustomer().getEmail(),
+                booking.getCustomer().getPhone(),
+                booking.getCaretaker().getName(),
+                booking.getCaretaker().getEmail(),
+                booking.getCaretaker().getPhone(),
+                booking.getCustomer().getPhotoUrl(),
+                booking.getCaretaker().getPhotoUrl(),
+                booking.getPet().getPhotoUrl(),
+                booking.getPet().getSpecies(),
+                booking.getPet().getBreed(),
+                booking.getPet().getAgeYears(),
+                booking.getPet().getNotes(),
+                booking.getPet().getFoodNotes(),
                 booking.getCreatedAt());
     }
 

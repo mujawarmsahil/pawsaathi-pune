@@ -85,3 +85,15 @@ export function getBookingDisplayName(booking: Booking, key: 'service' | 'pet' |
   if (key === 'pet') return booking.petName ?? booking.pet_name ?? 'Pet';
   return booking.caretakerName ?? booking.caretaker_name ?? 'Caretaker';
 }
+
+export const MAX_IMAGE_UPLOAD_BYTES = 2 * 1024 * 1024;
+export const IMAGE_UPLOAD_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+export function readImageFileAsDataUrl(imageFile: File) {
+  return new Promise<string>((resolve, reject) => {
+    const fileReader = new FileReader();
+    fileReader.onload = () => resolve(String(fileReader.result));
+    fileReader.onerror = () => reject(new Error('Could not read that image.'));
+    fileReader.readAsDataURL(imageFile);
+  });
+}

@@ -16,6 +16,8 @@ public interface AdminService {
 
     AdminCaretakerDetailResponse caretakerDetail(long caretakerId);
 
+    List<AdminBookingSummaryResponse> bookings();
+
     List<AdminBookingSummaryResponse> caretakerBookings(long caretakerId);
 
     AdminBookingDetailResponse bookingDetail(long bookingId);

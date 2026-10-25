@@ -9,4 +9,5 @@ public record PetResponse(
         String breed,
         BigDecimal ageYears,
         String notes,
+        String foodNotes,
         String photoUrl) {}

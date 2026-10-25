@@ -1,9 +1,12 @@
 package in.pawsaathi.pune.controller;
 
+import in.pawsaathi.pune.model.AdminBookingDetailResponse;
+import in.pawsaathi.pune.model.AdminBookingSummaryResponse;
 import in.pawsaathi.pune.model.BookingRequest;
 import in.pawsaathi.pune.model.BookingResponse;
 import in.pawsaathi.pune.model.BookingStatusRequest;
 import in.pawsaathi.pune.security.CurrentUserProvider;
+import in.pawsaathi.pune.service.AdminService;
 import in.pawsaathi.pune.service.BookingService;
 
 import jakarta.validation.Valid;
@@ -15,8 +18,8 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,10 +28,12 @@ import java.util.List;
 @RequestMapping("/api/bookings")
 public class BookingController {
     private final BookingService bookings;
+    private final AdminService admins;
     private final CurrentUserProvider currentUser;
 
-    public BookingController(BookingService bookings, CurrentUserProvider currentUser) {
+    public BookingController(BookingService bookings, AdminService admins, CurrentUserProvider currentUser) {
         this.bookings = bookings;
+        this.admins = admins;
         this.currentUser = currentUser;
     }
 
@@ -53,6 +58,24 @@ public class BookingController {
     public BookingResponse updateStatus(
             @PathVariable long id, @Valid @RequestBody BookingStatusRequest request) {
         var user = currentUser.require();
-        return bookings.changeStatus(user.id(), user.role(), id, request.status());
+        return bookings.changeStatus(user.id(), user.role(), id, request.status(), request.reason());
+    }
+
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<AdminBookingSummaryResponse> adminList() {
+        return admins.bookings();
+    }
+
+    @GetMapping("/admin/caretakers/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<AdminBookingSummaryResponse> caretakerBookings(@PathVariable long id) {
+        return admins.caretakerBookings(id);
+    }
+
+    @GetMapping("/admin/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public AdminBookingDetailResponse adminDetail(@PathVariable long id) {
+        return admins.bookingDetail(id);
     }
 }

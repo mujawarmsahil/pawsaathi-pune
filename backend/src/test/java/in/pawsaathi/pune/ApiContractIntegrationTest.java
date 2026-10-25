@@ -1,6 +1,7 @@
 package in.pawsaathi.pune;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -128,6 +129,142 @@ class ApiContractIntegrationTest {
         }
         mvc.perform(get("/api/admin/overview").header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void adminBookingListIncludesTimeSlotAndBothPartiesContactDetails() throws Exception {
+        BookingFixture fixture = bookingFixture("admin-booking-list");
+        createBooking(
+                fixture.customerToken(),
+                "admin-list",
+                bookingBody(fixture, "Admin list integration test"),
+                200);
+        String customerEmail =
+                jdbc.queryForObject(
+                        "SELECT email FROM users WHERE id=(SELECT customer_id FROM bookings"
+                                + " WHERE notes='Admin list integration test')",
+                        String.class);
+        String caretakerEmail = jdbc.queryForObject(
+                "SELECT email FROM users WHERE id=?", String.class, fixture.caretakerId());
+        String adminToken = token(login(createAdminAccount(uniqueEmail("admin-bookings"))));
+
+        mvc.perform(get("/api/admin/bookings").header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(
+                        result -> {
+                            JsonNode response =
+                                    mapper.readTree(result.getResponse().getContentAsString());
+                            JsonNode booking =
+                                    java.util.stream.StreamSupport.stream(
+                                                    response.spliterator(), false)
+                                            .filter(
+                                                    item ->
+                                                            customerEmail.equals(
+                                                                    item.path("customerEmail")
+                                                                            .asText()))
+                                            .findFirst()
+                                            .orElseThrow();
+                            org.junit.jupiter.api.Assertions.assertEquals(
+                                    customerEmail, booking.path("customerEmail").asText());
+                            org.junit.jupiter.api.Assertions.assertEquals(
+                                    caretakerEmail, booking.path("caretakerEmail").asText());
+                            org.junit.jupiter.api.Assertions.assertTrue(
+                                    booking.path("customerPhone").isNull());
+                            org.junit.jupiter.api.Assertions.assertTrue(
+                                    booking.path("caretakerPhone").isNull());
+                            org.junit.jupiter.api.Assertions.assertEquals(
+                                    "PENDING_PAYMENT", booking.path("status").asText());
+                            org.junit.jupiter.api.Assertions.assertEquals(
+                                    "PENDING", booking.path("paymentStatus").asText());
+                            org.junit.jupiter.api.Assertions.assertEquals(
+                                    fixture.startsAt().toString(), booking.path("startsAt").asText());
+                            org.junit.jupiter.api.Assertions.assertEquals(
+                                    fixture.endsAt().toString(), booking.path("endsAt").asText());
+                        });
+
+        mvc.perform(
+                        get("/api/admin/bookings")
+                                .header(
+                                        "Authorization",
+                                        "Bearer " + fixture.customerToken()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void bookingPaymentStatusIsExposedAndOmittedForCancelledBookings() throws Exception {
+        BookingFixture fixture = bookingFixture("payment-status");
+        MvcResult created =
+                createBooking(
+                        fixture.customerToken(),
+                        "payment-status",
+                        bookingBody(fixture, "Payment status integration test"),
+                        200);
+        long bookingId =
+                mapper.readTree(created.getResponse().getContentAsString()).path("id").asLong();
+        jdbc.update(
+                "INSERT INTO payments(booking_id,amount,status) VALUES(?,399.00,'PENDING')",
+                bookingId);
+
+        mvc.perform(
+                        get("/api/bookings")
+                                .header("Authorization", "Bearer " + fixture.customerToken()))
+                .andExpect(status().isOk())
+                .andExpect(
+                        result -> {
+                            JsonNode response =
+                                    mapper.readTree(result.getResponse().getContentAsString());
+                            JsonNode booking =
+                                    java.util.stream.StreamSupport.stream(
+                                                    response.spliterator(), false)
+                                            .filter(item -> item.path("id").asLong() == bookingId)
+                                            .findFirst()
+                                            .orElseThrow();
+                            org.junit.jupiter.api.Assertions.assertEquals(
+                                    "PENDING", booking.path("paymentStatus").asText());
+                        });
+
+        mvc.perform(
+                        patch("/api/bookings/" + bookingId + "/status")
+                                .header("Authorization", "Bearer " + fixture.customerToken())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"status\":\"CANCELLED\"}"))
+                .andExpect(status().isBadRequest());
+
+        mvc.perform(
+                        patch("/api/bookings/" + bookingId + "/status")
+                                .header("Authorization", "Bearer " + fixture.customerToken())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"status\":\"CANCELLED\",\"reason\":"
+                                                + "\"Plans changed\"}"))
+                .andExpect(status().isOk())
+                .andExpect(
+                        result -> {
+                            JsonNode response =
+                                    mapper.readTree(result.getResponse().getContentAsString());
+                            org.junit.jupiter.api.Assertions.assertTrue(
+                                    response.path("paymentStatus").isNull());
+                            org.junit.jupiter.api.Assertions.assertEquals(
+                                    "Plans changed", response.path("cancellationReason").asText());
+                        });
+
+        mvc.perform(
+                        get("/api/bookings")
+                                .header("Authorization", "Bearer " + fixture.customerToken()))
+                .andExpect(status().isOk())
+                .andExpect(
+                        result -> {
+                            JsonNode response =
+                                    mapper.readTree(result.getResponse().getContentAsString());
+                            JsonNode booking =
+                                    java.util.stream.StreamSupport.stream(
+                                                    response.spliterator(), false)
+                                            .filter(item -> item.path("id").asLong() == bookingId)
+                                            .findFirst()
+                                            .orElseThrow();
+                            org.junit.jupiter.api.Assertions.assertTrue(
+                                    booking.path("paymentStatus").isNull());
+                        });
     }
 
     @Test

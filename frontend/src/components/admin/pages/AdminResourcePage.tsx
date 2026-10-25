@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import { EmptyState } from '../../common/feedback/FeedbackStates';
 
 const resourceTitlesByKey: Record<string, string> = {
-  bookings: 'Booking oversight',
   users: 'Customer and caretaker accounts',
   services: 'Services and areas',
   payments: 'Payments and refunds',

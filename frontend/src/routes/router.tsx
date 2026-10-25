@@ -7,13 +7,13 @@ import { AdminLayout } from '../components/layout/AdminLayout';
 import { AppLayout } from '../components/layout/AppLayout';
 import { PublicLayout } from '../components/layout/PublicLayout';
 import {
-  AdminBookingDetailPage,
   AdminCaretakerDetailPage,
   AdminCaretakersPage,
   AdminOverviewPage,
   AdminProfilePage,
   AdminResourcePage,
   AdminReviewsPage,
+  BookingsPage,
   AdminSupportPage,
 } from '../pages/admin/AdminPages';
 import { LoginPage, PasswordChangePage, RegisterPage } from '../pages/auth/AuthPages';
@@ -99,11 +99,11 @@ export const router = createBrowserRouter([
                   { path: '/admin', element: <AdminOverviewPage /> },
                   { path: '/admin/caretakers', element: <AdminCaretakersPage /> },
                   { path: '/admin/caretakers/:id', element: <AdminCaretakerDetailPage /> },
-                  { path: '/admin/bookings/:id', element: <AdminBookingDetailPage /> },
+                  { path: '/admin/bookings/:id', element: <BookingDetailPage /> },
                   { path: '/admin/reviews', element: <AdminReviewsPage /> },
                   { path: '/admin/support', element: <AdminSupportPage /> },
                   { path: '/admin/profile', element: <AdminProfilePage /> },
-                  { path: '/admin/bookings', element: <AdminResourcePage /> },
+                  { path: '/admin/bookings', element: <BookingsPage /> },
                   { path: '/admin/users', element: <AdminResourcePage /> },
                   { path: '/admin/services', element: <AdminResourcePage /> },
                   { path: '/admin/payments', element: <AdminResourcePage /> },

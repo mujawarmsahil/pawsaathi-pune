@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { endpoints } from '../../api/endpoints';
-import { AdminBookingDetailPage } from '../../components/admin/AdminPages';
+import { BookingDetailPage } from '../../components/admin/AdminPages';
 import type { AdminBookingDetail } from '../../types/api';
 
 const detail: AdminBookingDetail = {
@@ -17,6 +17,9 @@ const detail: AdminBookingDetail = {
   totalAmount: 1000,
   location: 'Baner, Pune',
   notes: 'Bruno needs a walk before lunch.',
+  cancellationReason: null,
+  rating: null,
+  review: null,
   createdAt: '2026-10-30T09:15:00Z',
   serviceName: 'Pet sitting',
   serviceDescription: 'In-home care and companionship.',
@@ -39,6 +42,7 @@ const detail: AdminBookingDetail = {
     breed: 'Golden Retriever',
     ageYears: 3.5,
     notes: 'Friendly and energetic.',
+    foodNotes: 'Chicken and rice twice a day.',
     photoUrl: null,
   },
   payment: {
@@ -56,7 +60,7 @@ function renderPage() {
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={['/admin/bookings/10']}>
         <Routes>
-          <Route path="/admin/bookings/:id" element={<AdminBookingDetailPage />} />
+          <Route path="/admin/bookings/:id" element={<BookingDetailPage />} />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>,
@@ -96,5 +100,31 @@ describe('admin booking details', () => {
     renderPage();
 
     expect(await screen.findByText('No payment recorded for this booking.')).toBeInTheDocument();
+  });
+
+  it('shows the cancellation reason for cancelled bookings', async () => {
+    vi.spyOn(endpoints.admin, 'bookingDetail').mockResolvedValue({
+      ...detail,
+      status: 'CANCELLED',
+      cancellationReason: 'Owner travelling',
+    });
+    renderPage();
+
+    expect(await screen.findByRole('heading', { name: 'Cancellation reason' })).toBeInTheDocument();
+    expect(screen.getByText('Owner travelling')).toBeInTheDocument();
+  });
+
+  it('shows the customer review for completed bookings', async () => {
+    vi.spyOn(endpoints.admin, 'bookingDetail').mockResolvedValue({
+      ...detail,
+      status: 'COMPLETED',
+      rating: 5,
+      review: 'Excellent care',
+    });
+    renderPage();
+
+    expect(await screen.findByRole('heading', { name: 'Customer review' })).toBeInTheDocument();
+    expect(screen.getByText('5/5')).toBeInTheDocument();
+    expect(screen.getByText('"Excellent care"')).toBeInTheDocument();
   });
 });

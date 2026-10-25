@@ -1,5 +1,6 @@
 package in.pawsaathi.pune.service;
 
+import in.pawsaathi.pune.exception.BadRequestException;
 import in.pawsaathi.pune.exception.ConflictException;
 import in.pawsaathi.pune.exception.ForbiddenException;
 import in.pawsaathi.pune.exception.InvalidStateTransitionException;
@@ -13,7 +14,9 @@ import in.pawsaathi.pune.entity.Booking;
 import in.pawsaathi.pune.entity.BookingStatus;
 import in.pawsaathi.pune.entity.BookingStatusHistory;
 import in.pawsaathi.pune.entity.Notification;
+import in.pawsaathi.pune.entity.Payment;
 import in.pawsaathi.pune.entity.PaymentStatus;
+import in.pawsaathi.pune.entity.Review;
 import in.pawsaathi.pune.repository.AuditLogRepository;
 import in.pawsaathi.pune.repository.BookingIdempotencyRepository;
 import in.pawsaathi.pune.repository.BookingRepository;
@@ -23,6 +26,7 @@ import in.pawsaathi.pune.repository.CaretakerProfileRepository;
 import in.pawsaathi.pune.repository.NotificationRepository;
 import in.pawsaathi.pune.repository.PaymentRepository;
 import in.pawsaathi.pune.repository.PetRepository;
+import in.pawsaathi.pune.repository.ReviewRepository;
 import in.pawsaathi.pune.repository.ServiceCatalogRepository;
 import in.pawsaathi.pune.repository.UserRepository;
 
@@ -39,7 +43,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -62,6 +68,7 @@ public class BookingServiceImpl implements BookingService {
     private final CaretakerProfileRepository caretakers;
     private final CaretakerAvailabilityRepository availability;
     private final PaymentRepository payments;
+    private final ReviewRepository reviews;
     private final NotificationRepository notifications;
     private final AuditLogRepository auditLogs;
     private final ResponseMapper responseMapper;
@@ -78,6 +85,7 @@ public class BookingServiceImpl implements BookingService {
             CaretakerProfileRepository caretakers,
             CaretakerAvailabilityRepository availability,
             PaymentRepository payments,
+            ReviewRepository reviews,
             NotificationRepository notifications,
             AuditLogRepository auditLogs,
             ResponseMapper responseMapper,
@@ -92,6 +100,7 @@ public class BookingServiceImpl implements BookingService {
         this.caretakers = caretakers;
         this.availability = availability;
         this.payments = payments;
+        this.reviews = reviews;
         this.notifications = notifications;
         this.auditLogs = auditLogs;
         this.responseMapper = responseMapper;
@@ -111,7 +120,17 @@ public class BookingServiceImpl implements BookingService {
                             bookings.findByCaretakerIdOrderByStartsAtDesc(currentUserId);
                     default -> throw new ForbiddenException("Booking access is not available.");
                 };
-        return result.stream().map(responseMapper::toResponse).toList();
+        Map<Long, PaymentStatus> paymentStatuses = paymentStatuses(result);
+        Map<Long, Review> reviewsByBooking = reviewsByBookingId(result);
+        return result.stream()
+                .map(
+                        booking ->
+                                responseMapper.toResponse(
+                                        booking,
+                                        displayPaymentStatus(
+                                                booking, paymentStatuses.get(booking.getId())),
+                                        reviewsByBooking.get(booking.getId())))
+                .toList();
     }
 
     @Override
@@ -139,7 +158,7 @@ public class BookingServiceImpl implements BookingService {
                                     () ->
                                             new IllegalStateException(
                                                     "Booking idempotency record references no owner booking."));
-            return responseMapper.toResponse(existing);
+            return responseMapper.toResponse(existing, paymentStatusFor(existing));
         }
 
         LocalDateTime now = LocalDateTime.now(BUSINESS_ZONE);
@@ -225,7 +244,7 @@ public class BookingServiceImpl implements BookingService {
         if (idempotencyKey != null) {
             idempotency.associateBooking(customerId, idempotencyKey, booking.getId());
         }
-        return responseMapper.toResponse(booking);
+        return responseMapper.toResponse(booking, paymentStatusFor(booking));
     }
 
     private String requestHash(BookingRequest request) {
@@ -242,7 +261,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingResponse changeStatus(
-            long currentUserId, String role, long bookingId, BookingStatus nextStatus) {
+            long currentUserId,
+            String role,
+            long bookingId,
+            BookingStatus nextStatus,
+            String reason) {
         AppUser actor =
                 users.findById(currentUserId)
                         .orElseThrow(() -> new NotFoundException("Account not found."));
@@ -259,15 +282,25 @@ public class BookingServiceImpl implements BookingService {
                 nextStatus)) {
             throw new InvalidStateTransitionException("This booking status change is not allowed.");
         }
-        if (nextStatus == BookingStatus.CANCELLED || nextStatus == BookingStatus.REJECTED) {
-            if (payments.existsByBookingIdAndStatus(bookingId, PaymentStatus.SUCCEEDED)) {
-                throw new ConflictException(
-                        "This booking has been paid. Contact support to arrange cancellation and"
-                            + " refund.");
-            }
+        boolean cancellation =
+                nextStatus == BookingStatus.CANCELLED || nextStatus == BookingStatus.REJECTED;
+        if (cancellation
+                && payments.existsByBookingIdAndStatus(bookingId, PaymentStatus.SUCCEEDED)) {
+            throw new ConflictException(
+                    "This booking has been paid. Contact support to arrange cancellation and"
+                        + " refund.");
         }
-        booking.transitionTo(nextStatus);
-        history.save(new BookingStatusHistory(booking, current, nextStatus, actor, null));
+        String cancellationReason = clean(reason);
+        if (cancellation && cancellationReason == null) {
+            throw new BadRequestException(
+                    nextStatus == BookingStatus.REJECTED
+                            ? "A decline reason is required."
+                            : "A cancellation reason is required.");
+        }
+        booking.transitionTo(nextStatus, cancellationReason);
+        history.save(
+                new BookingStatusHistory(
+                        booking, current, nextStatus, actor, cancellationReason));
         auditLogs.save(new AuditLog(actor, "BOOKING_" + nextStatus.name(), "BOOKING", bookingId));
         AppUser recipient =
                 actor.getId().equals(booking.getCaretaker().getId())
@@ -283,7 +316,35 @@ public class BookingServiceImpl implements BookingService {
                                 + nextStatus.name().toLowerCase().replace('_', ' ')
                                 + ".",
                         "BOOKING"));
-        return responseMapper.toResponse(booking);
+        return responseMapper.toResponse(booking, paymentStatusFor(booking));
+    }
+
+    private Map<Long, Review> reviewsByBookingId(List<Booking> bookingList) {
+        List<Long> bookingIds = bookingList.stream().map(Booking::getId).toList();
+        if (bookingIds.isEmpty()) return Map.of();
+        return reviews.findByBookingIdIn(bookingIds).stream()
+                .collect(Collectors.toMap(review -> review.getBooking().getId(), review -> review));
+    }
+
+    private Map<Long, PaymentStatus> paymentStatuses(List<Booking> bookingList) {
+        List<Long> bookingIds = bookingList.stream().map(Booking::getId).toList();
+        if (bookingIds.isEmpty()) return Map.of();
+        return payments.findByBookingIdIn(bookingIds).stream()
+                .collect(
+                        Collectors.toMap(
+                                payment -> payment.getBooking().getId(), Payment::getStatus));
+    }
+
+    private PaymentStatus paymentStatusFor(Booking booking) {
+        if (!booking.getStatus().requiresPayment()) return null;
+        return payments.findByBookingId(booking.getId())
+                .map(Payment::getStatus)
+                .orElse(PaymentStatus.PENDING);
+    }
+
+    private PaymentStatus displayPaymentStatus(Booking booking, PaymentStatus paymentStatus) {
+        if (!booking.getStatus().requiresPayment()) return null;
+        return paymentStatus == null ? PaymentStatus.PENDING : paymentStatus;
     }
 
     private String clean(String value) {

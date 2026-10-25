@@ -12,5 +12,9 @@ public interface BookingService {
     BookingResponse create(long customerId, BookingRequest request, String idempotencyKey);
 
     BookingResponse changeStatus(
-            long currentUserId, String role, long bookingId, BookingStatus nextStatus);
+            long currentUserId,
+            String role,
+            long bookingId,
+            BookingStatus nextStatus,
+            String reason);
 }

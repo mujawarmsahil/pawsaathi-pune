@@ -70,7 +70,11 @@ export type Pet = {
   breed?: string;
   ageYears?: number;
   notes?: string;
+  foodNotes?: string;
+  photoUrl?: string;
 };
+
+export type PaymentStatus = 'PENDING' | 'SUCCEEDED' | 'FAILED' | 'REFUNDED';
 
 export type Booking = {
   id: number;
@@ -79,6 +83,10 @@ export type Booking = {
   petId?: number;
   serviceId?: number;
   status: string;
+  paymentStatus?: PaymentStatus | null;
+  cancellationReason?: string | null;
+  rating?: number | null;
+  review?: string | null;
   startsAt: string;
   endsAt: string;
   hourlyRate: number;
@@ -90,6 +98,18 @@ export type Booking = {
   customer_name?: string;
   caretakerName?: string;
   caretaker_name?: string;
+  customerEmail?: string | null;
+  customerPhone?: string | null;
+  caretakerEmail?: string | null;
+  caretakerPhone?: string | null;
+  customerPhotoUrl?: string | null;
+  caretakerPhotoUrl?: string | null;
+  petPhotoUrl?: string | null;
+  petSpecies?: string | null;
+  petBreed?: string | null;
+  petAgeYears?: number | null;
+  petNotes?: string | null;
+  petFoodNotes?: string | null;
 };
 
 export type PageResult<T> = {
@@ -144,6 +164,10 @@ export type AdminCaretakerDetail = {
 export type AdminBookingSummary = {
   id: number;
   status: string;
+  paymentStatus: PaymentStatus | null;
+  cancellationReason: string | null;
+  rating: number | null;
+  review: string | null;
   startsAt: string;
   endsAt: string;
   durationMinutes: number;
@@ -152,6 +176,19 @@ export type AdminBookingSummary = {
   serviceName: string;
   petName: string;
   customerName: string;
+  customerEmail: string;
+  customerPhone: string | null;
+  caretakerName: string;
+  caretakerEmail: string;
+  caretakerPhone: string | null;
+  customerPhotoUrl: string | null;
+  caretakerPhotoUrl: string | null;
+  petPhotoUrl: string | null;
+  petSpecies: string;
+  petBreed: string | null;
+  petAgeYears: number | null;
+  petNotes: string | null;
+  petFoodNotes: string | null;
   createdAt: string;
 };
 
@@ -176,6 +213,7 @@ export type AdminBookingPet = {
   breed: string | null;
   ageYears: number | null;
   notes: string | null;
+  foodNotes: string | null;
   photoUrl: string | null;
 };
 
@@ -195,6 +233,9 @@ export type AdminBookingDetail = {
   totalAmount: number;
   location: string | null;
   notes: string | null;
+  cancellationReason: string | null;
+  rating: number | null;
+  review: string | null;
   createdAt: string;
   serviceName: string;
   serviceDescription: string | null;

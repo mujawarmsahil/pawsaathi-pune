@@ -1,5 +1,4 @@
 export {
-  AdminBookingDetailPage,
   AdminCaretakerDetailPage,
   AdminCaretakersPage,
   AdminOverviewPage,
@@ -7,4 +6,6 @@ export {
   AdminResourcePage,
   AdminReviewsPage,
   AdminSupportPage,
+  BookingDetailPage,
+  BookingsPage,
 } from '../../components/admin/AdminPages';

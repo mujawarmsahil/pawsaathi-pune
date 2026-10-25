@@ -102,10 +102,10 @@ export const endpoints = {
         method: 'POST',
         body: JSON.stringify(body),
       }),
-    updateStatus: (id: number, status: string) =>
+    updateStatus: (id: number, status: string, reason?: string) =>
       apiRequest<Booking>(`/bookings/${id}/status`, {
         method: 'PATCH',
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status, reason }),
       }),
   },
   payments: {
@@ -158,6 +158,7 @@ export const endpoints = {
   admin: {
     overview: () => apiRequest<AdminSummary>('/admin/overview'),
     caretakers: () => apiRequest<CaretakerCandidate[]>('/admin/caretakers'),
+    bookings: () => apiRequest<AdminBookingSummary[]>('/admin/bookings'),
     caretakerDetail: (id: number) => apiRequest<AdminCaretakerDetail>(`/admin/caretakers/${id}`),
     caretakerBookings: (id: number) =>
       apiRequest<AdminBookingSummary[]>(`/admin/caretakers/${id}/bookings`),

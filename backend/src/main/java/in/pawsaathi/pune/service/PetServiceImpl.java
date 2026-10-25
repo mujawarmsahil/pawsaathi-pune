@@ -48,7 +48,9 @@ public class PetServiceImpl implements PetService {
                                 request.species().trim(),
                                 clean(request.breed()),
                                 request.ageYears(),
-                                clean(request.notes())));
+                                clean(request.notes()),
+                                clean(request.foodNotes()),
+                                clean(request.photoUrl())));
         return responseMapper.toResponse(pet);
     }
 
@@ -61,7 +63,9 @@ public class PetServiceImpl implements PetService {
                 request.species().trim(),
                 clean(request.breed()),
                 request.ageYears(),
-                clean(request.notes()));
+                clean(request.notes()),
+                clean(request.foodNotes()),
+                clean(request.photoUrl()));
         return responseMapper.toResponse(pets.save(pet));
     }
 

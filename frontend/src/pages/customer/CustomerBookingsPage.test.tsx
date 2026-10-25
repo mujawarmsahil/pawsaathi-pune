@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -37,18 +37,35 @@ afterEach(() => {
 });
 
 describe('customer booking actions', () => {
-  it('cancels a booking only after confirmation', async () => {
+  it('cancels a booking only after confirmation with a reason', async () => {
     const updateStatus = vi
       .spyOn(endpoints.bookings, 'updateStatus')
       .mockResolvedValue({ ...booking, status: 'CANCELLED' });
     vi.spyOn(endpoints.bookings, 'list').mockResolvedValue([booking]);
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     renderBookings();
     await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
 
-    await waitFor(() => expect(updateStatus.mock.calls[0]?.[0]).toBe(31));
-    expect(updateStatus.mock.calls[0]?.[1]).toBe('CANCELLED');
+    const dialog = screen.getByRole('dialog', { name: 'Cancel this booking?' });
+    const confirmButton = within(dialog).getByRole('button', { name: 'Cancel booking' });
+    expect(confirmButton).toBeDisabled();
+    await userEvent.type(within(dialog).getByLabelText('Reason for cancellation'), 'Plans changed');
+    await userEvent.click(confirmButton);
+
+    await waitFor(() =>
+      expect(updateStatus).toHaveBeenCalledWith(31, 'CANCELLED', 'Plans changed'),
+    );
+  });
+
+  it('shows the cancellation reason on cancelled booking cards', async () => {
+    vi.spyOn(endpoints.bookings, 'list').mockResolvedValue([
+      { ...booking, status: 'CANCELLED', cancellationReason: 'Caretaker unavailable' },
+    ]);
+
+    renderBookings();
+
+    expect(await screen.findByText('Cancellation reason')).toBeInTheDocument();
+    expect(screen.getByText('Caretaker unavailable')).toBeInTheDocument();
   });
 
   it('clearly marks rescheduling unavailable instead of sending a dead API request', async () => {

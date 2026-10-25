@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { CalendarDays } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -7,9 +6,10 @@ import { endpoints } from '../../api/endpoints';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useBookingMutations, useBookings } from '../../hooks/useBookings';
 import type { Booking } from '../../types/api';
-import { formatDateTime, formatINR, getBookingDisplayName } from '../../utils';
-import { EmptyState, ErrorState, LoadingState } from '../common/feedback/FeedbackStates';
-import { StatusBadge } from '../common/ui/StatusBadge';
+import { getBookingDisplayName } from '../../utils';
+import { BookingCard, type BookingCardModel } from '../booking/BookingCard';
+import { EmptyState, ErrorState } from '../common/feedback/FeedbackStates';
+import { ReasonDialog } from '../common/ui/ReasonDialog';
 
 type RazorpayPaymentResult = {
   razorpay_order_id: string;
@@ -56,6 +56,46 @@ function loadRazorpayCheckout(): Promise<void> {
     document.head.append(checkoutScriptElement);
   });
   return razorpayCheckoutScriptPromise;
+}
+
+function toBookingCardModel(booking: Booking): BookingCardModel {
+  return {
+    id: booking.id,
+    status: booking.status,
+    paymentStatus: booking.paymentStatus,
+    cancellationReason: booking.cancellationReason,
+    rating: booking.rating ?? null,
+    review: booking.review ?? null,
+    startsAt: booking.startsAt,
+    endsAt: booking.endsAt,
+    serviceName: getBookingDisplayName(booking, 'service'),
+    pet: {
+      name: getBookingDisplayName(booking, 'pet'),
+      photoUrl: booking.petPhotoUrl,
+      species: booking.petSpecies,
+      breed: booking.petBreed,
+      ageYears: booking.petAgeYears,
+      notes: booking.petNotes,
+      foodNotes: booking.petFoodNotes,
+    },
+    owner: {
+      label: 'Owner',
+      name: booking.customerName ?? booking.customer_name ?? 'You',
+      email: booking.customerEmail,
+      phone: booking.customerPhone,
+      photoUrl: booking.customerPhotoUrl,
+    },
+    caretaker: {
+      label: 'Caretaker',
+      name: getBookingDisplayName(booking, 'caretaker'),
+      email: booking.caretakerEmail,
+      phone: booking.caretakerPhone,
+      photoUrl: booking.caretakerPhotoUrl,
+      href: booking.caretakerId ? `/caretakers/${booking.caretakerId}` : undefined,
+    },
+    hourlyRate: booking.hourlyRate,
+    detailsHref: `/app/bookings/${booking.id}`,
+  };
 }
 
 function BookingPaymentButton({ booking }: { booking: Booking }) {
@@ -130,8 +170,9 @@ function BookingPaymentButton({ booking }: { booking: Booking }) {
 export function CustomerBookingsPage() {
   const bookingsQuery = useBookings();
   const { updateStatus } = useBookingMutations();
-  const [error, setError] = useState('');
-  if (bookingsQuery.isPending) return <LoadingState label="Loading your bookings…" />;
+  const [cancellationTarget, setCancellationTarget] = useState<Booking | null>(null);
+  const [cancellationReason, setCancellationReason] = useState('');
+  const [cancellationError, setCancellationError] = useState('');
   if (bookingsQuery.isError)
     return (
       <ErrorState
@@ -151,12 +192,18 @@ export function CustomerBookingsPage() {
           Find care
         </Link>
       </div>
-      {error && (
-        <div className="alert" role="alert">
-          {error}
+      {bookingsQuery.isPending ? (
+        <div
+          className="booking-card-grid"
+          role="status"
+          aria-label="Loading your bookings"
+          aria-busy="true"
+        >
+          {['first', 'second', 'third'].map((key) => (
+            <BookingCard isLoading key={key} />
+          ))}
         </div>
-      )}
-      {bookingsQuery.data.length === 0 ? (
+      ) : bookingsQuery.data.length === 0 ? (
         <EmptyState
           title="No bookings yet"
           message="Explore approved local caretakers and send your first request."
@@ -167,56 +214,72 @@ export function CustomerBookingsPage() {
           }
         />
       ) : (
-        <div className="booking-list">
+        <div className="booking-card-grid" role="list">
           {bookingsQuery.data.map((booking) => (
-            <article className="booking-row" key={booking.id}>
-              <div className="booking-date">
-                <CalendarDays size={17} />
-                <span>
-                  {new Date(booking.startsAt).toLocaleDateString('en-IN', {
-                    day: 'numeric',
-                    month: 'short',
-                  })}
-                </span>
-              </div>
-              <div className="booking-info">
-                <b>
-                  {getBookingDisplayName(booking, 'service')} ·{' '}
-                  {getBookingDisplayName(booking, 'pet')}
-                </b>
-                <span>
-                  with {getBookingDisplayName(booking, 'caretaker')} ·{' '}
-                  {formatDateTime(booking.startsAt)} · ₹
-                  {formatINR(booking.hourlyRate)}/hr
-                </span>
-              </div>
-              <StatusBadge status={booking.status} />
-              <Link className="text-link" to={`/app/bookings/${booking.id}`}>
-                Details
-              </Link>
-              {booking.status === 'PENDING_PAYMENT' && <BookingPaymentButton booking={booking} />}
-              {['REQUESTED', 'ACCEPTED', 'CONFIRMED'].includes(booking.status) && (
-                <span className="muted-label">Rescheduling is coming soon.</span>
-              )}
-              {['PENDING_PAYMENT', 'REQUESTED', 'CONFIRMED'].includes(booking.status) && (
-                <button
-                  className="cancel-booking"
-                  disabled={updateStatus.isPending}
-                  onClick={() => {
-                    if (window.confirm('Cancel this booking request?'))
-                      updateStatus.mutate(
-                        { id: booking.id, status: 'CANCELLED' },
-                        { onError: (cause) => setError(cause.message) },
-                      );
-                  }}
-                >
-                  Cancel
-                </button>
-              )}
-            </article>
+            <BookingCard
+              actions={
+                <>
+                  {booking.status === 'PENDING_PAYMENT' && (
+                    <BookingPaymentButton booking={booking} />
+                  )}
+                  {['REQUESTED', 'ACCEPTED', 'CONFIRMED'].includes(booking.status) && (
+                    <span className="muted-label">Rescheduling is coming soon.</span>
+                  )}
+                  {['PENDING_PAYMENT', 'REQUESTED', 'CONFIRMED'].includes(booking.status) && (
+                    <button
+                      className="cancel-booking"
+                      disabled={updateStatus.isPending}
+                      onClick={() => {
+                        setCancellationReason('');
+                        setCancellationError('');
+                        setCancellationTarget(booking);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </>
+              }
+              booking={toBookingCardModel(booking)}
+              key={booking.id}
+            />
           ))}
         </div>
       )}
+      <ReasonDialog
+        open={cancellationTarget !== null}
+        title="Cancel this booking?"
+        description="Tell us why you are cancelling. The caretaker and support team will see this reason."
+        fieldLabel="Reason for cancellation"
+        placeholder="Plans changed, schedule conflict, or another reason"
+        confirmLabel="Cancel booking"
+        cancelLabel="Keep booking"
+        reason={cancellationReason}
+        onReasonChange={setCancellationReason}
+        busy={updateStatus.isPending}
+        error={cancellationError}
+        onCancel={() => {
+          if (updateStatus.isPending) return;
+          setCancellationTarget(null);
+          setCancellationError('');
+        }}
+        onConfirm={() => {
+          if (!cancellationTarget) return;
+          const reason = cancellationReason.trim();
+          if (!reason) return;
+          setCancellationError('');
+          updateStatus.mutate(
+            { id: cancellationTarget.id, status: 'CANCELLED', reason },
+            {
+              onSuccess: () => {
+                setCancellationTarget(null);
+                setCancellationReason('');
+              },
+              onError: (cause) => setCancellationError(cause.message),
+            },
+          );
+        }}
+      />
     </>
   );
 }

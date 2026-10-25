@@ -11,5 +11,9 @@ public enum BookingStatus {
     REJECTED,
     PAYMENT_FAILED,
     REFUNDED,
-    PENDING
+    PENDING;
+
+    public boolean requiresPayment() {
+        return this != CANCELLED && this != REJECTED && this != REFUNDED;
+    }
 }

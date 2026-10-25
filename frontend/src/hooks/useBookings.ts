@@ -15,8 +15,8 @@ export function useBookingMutations() {
       onSuccess: refreshBookingQueries,
     }),
     updateStatus: useMutation({
-      mutationFn: ({ id, status }: { id: number; status: string }) =>
-        endpoints.bookings.updateStatus(id, status),
+      mutationFn: ({ id, status, reason }: { id: number; status: string; reason?: string }) =>
+        endpoints.bookings.updateStatus(id, status, reason),
       onSuccess: refreshBookingQueries,
     }),
   };
