@@ -13,8 +13,8 @@ import {
   AdminProfilePage,
   AdminResourcePage,
   AdminReviewsPage,
-  BookingsPage,
   AdminSupportPage,
+  BookingsPage,
 } from '../pages/admin/AdminPages';
 import { LoginPage, PasswordChangePage, RegisterPage } from '../pages/auth/AuthPages';
 import {
