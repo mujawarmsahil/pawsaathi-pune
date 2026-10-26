@@ -148,7 +148,7 @@ class ApiContractIntegrationTest {
                 "SELECT email FROM users WHERE id=?", String.class, fixture.caretakerId());
         String adminToken = token(login(createAdminAccount(uniqueEmail("admin-bookings"))));
 
-        mvc.perform(get("/api/admin/bookings").header("Authorization", "Bearer " + adminToken))
+        mvc.perform(get("/api/bookings/admin").header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andExpect(
                         result -> {
@@ -183,7 +183,7 @@ class ApiContractIntegrationTest {
                         });
 
         mvc.perform(
-                        get("/api/admin/bookings")
+                        get("/api/bookings/admin")
                                 .header(
                                         "Authorization",
                                         "Bearer " + fixture.customerToken()))

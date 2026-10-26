@@ -34,9 +34,9 @@ public class CaretakerQueryRepository {
                     WHERE csa.caretaker_id=u.id),'') service_areas,
                   cp.photo_url,cp.languages,
                   (SELECT COUNT(*) FROM reviews r
-                    WHERE r.caretaker_id=u.id AND r.moderation_status='APPROVED') review_count,
+                    WHERE r.caretaker_id=u.id) review_count,
                   (SELECT AVG(r.rating) FROM reviews r
-                    WHERE r.caretaker_id=u.id AND r.moderation_status='APPROVED') rating
+                    WHERE r.caretaker_id=u.id) rating
                 FROM users u
                 JOIN roles ro ON ro.id=u.role_id
                 JOIN caretaker_profiles cp ON cp.user_id=u.id
@@ -145,7 +145,7 @@ public class CaretakerQueryRepository {
                 jdbc.queryForObject(
                         """
                         SELECT COALESCE(AVG(rating),0) rating,COUNT(*) review_count
-                        FROM reviews WHERE caretaker_id=? AND moderation_status='APPROVED'
+                        FROM reviews WHERE caretaker_id=?
                         """,
                         (rs, rowNum) ->
                                 new Rating(
@@ -247,9 +247,12 @@ public class CaretakerQueryRepository {
         List<ReviewResponse> reviews =
                 jdbc.query(
                         """
-                        SELECT r.id,r.rating,r.comment,r.moderation_status,r.booking_id,
+                        SELECT r.id,r.rating,r.comment,r.booking_id,r.caretaker_id,
+                          p.id pet_id,p.name pet_name,
                           author.name author,caretaker.name caretaker,r.created_at
                         FROM reviews r
+                        JOIN bookings b ON b.id=r.booking_id
+                        JOIN pets p ON p.id=b.pet_id
                         JOIN users author ON author.id=r.author_id
                         JOIN users caretaker ON caretaker.id=r.caretaker_id
                         WHERE r.caretaker_id=?
@@ -260,8 +263,10 @@ public class CaretakerQueryRepository {
                                         rs.getLong("id"),
                                         rs.getInt("rating"),
                                         rs.getString("comment"),
-                                        rs.getString("moderation_status"),
                                         rs.getLong("booking_id"),
+                                        rs.getLong("caretaker_id"),
+                                        rs.getLong("pet_id"),
+                                        rs.getString("pet_name"),
                                         rs.getString("author"),
                                         rs.getString("caretaker"),
                                         rs.getTimestamp("created_at").toInstant()),
@@ -270,7 +275,7 @@ public class CaretakerQueryRepository {
                 jdbc.queryForObject(
                         """
                         SELECT COALESCE(AVG(rating),0) rating,COUNT(*) review_count
-                        FROM reviews WHERE caretaker_id=? AND moderation_status='APPROVED'
+                        FROM reviews WHERE caretaker_id=?
                         """,
                         (rs, rowNum) ->
                                 new Rating(

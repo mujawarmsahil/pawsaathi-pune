@@ -85,8 +85,6 @@ export type Booking = {
   status: string;
   paymentStatus?: PaymentStatus | null;
   cancellationReason?: string | null;
-  rating?: number | null;
-  review?: string | null;
   startsAt: string;
   endsAt: string;
   hourlyRate: number;
@@ -110,6 +108,8 @@ export type Booking = {
   petAgeYears?: number | null;
   petNotes?: string | null;
   petFoodNotes?: string | null;
+  rating?: number | null;
+  review?: string | null;
 };
 
 export type PageResult<T> = {
@@ -132,8 +132,10 @@ export type AdminCaretakerReview = {
   id: number;
   rating: number;
   comment: string | null;
-  moderationStatus: string;
   bookingId: number;
+  caretakerId: number;
+  petId: number;
+  petName: string;
   author: string;
   caretaker: string;
   createdAt: string;
@@ -277,8 +279,49 @@ export type Notification = {
 export type Review = {
   id: number;
   rating: number;
-  comment: string;
-  moderationStatus: string;
+  comment: string | null;
+  bookingId: number;
+  caretakerId: number;
+  petId: number;
+  petName: string;
+  author: string;
+  caretaker: string;
+  createdAt: string;
+};
+
+export type AdminCaretakerSummary = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  photoUrl: string | null;
+  bio: string | null;
+  experienceYears: number | null;
+  hourlyRate: number;
+  serviceAreas: string;
+  approvalStatus: string;
+  verified: boolean;
+};
+
+export type AdminBooking = {
+  id: number;
+  status: string;
+  startsAt: string;
+  endsAt: string;
+  hourlyRate: number;
+  serviceName: string;
+  petName: string;
+  customerName: string;
+  caretakerName: string;
+  createdAt: string;
+};
+
+export type AdminSupportTicket = {
+  id: number;
+  subject: string;
+  description: string;
+  status: string;
+  priority: string;
   createdAt: string;
 };
 

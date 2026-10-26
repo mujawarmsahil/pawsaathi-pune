@@ -45,9 +45,6 @@ public class Review {
     @Column(columnDefinition = "TEXT")
     private String comment;
 
-    @Column(name = "moderation_status", nullable = false, length = 24)
-    private String moderationStatus = "PENDING";
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -64,10 +61,6 @@ public class Review {
         this.caretaker = caretaker;
         this.rating = rating;
         this.comment = comment;
-    }
-
-    public void moderate(String status) {
-        this.moderationStatus = status;
     }
 
     public Long getId() {
@@ -92,10 +85,6 @@ public class Review {
 
     public String getComment() {
         return comment;
-    }
-
-    public String getModerationStatus() {
-        return moderationStatus;
     }
 
     public Instant getCreatedAt() {

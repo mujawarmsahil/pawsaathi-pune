@@ -1,7 +1,6 @@
 package in.pawsaathi.pune.controller;
 
 import in.pawsaathi.pune.model.CreateReviewRequest;
-import in.pawsaathi.pune.model.ModerateReviewRequest;
 import in.pawsaathi.pune.model.ReviewResponse;
 import in.pawsaathi.pune.security.CurrentUserProvider;
 import in.pawsaathi.pune.service.ReviewService;
@@ -10,7 +9,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,21 +37,13 @@ public class ReviewController {
     @PostMapping("/reviews")
     @PreAuthorize("hasRole('CUSTOMER')")
     public Map<String, String> create(@Valid @RequestBody CreateReviewRequest request) {
-        ReviewResponse review = reviews.create(currentUser.require().id(), request);
-        return Map.of("submitted", "true", "moderationStatus", review.moderationStatus());
+        reviews.create(currentUser.require().id(), request);
+        return Map.of("submitted", "true");
     }
 
     @GetMapping("/admin/reviews")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<ReviewResponse> moderationQueue() {
-        return reviews.allForModeration();
-    }
-
-    @PatchMapping("/admin/reviews/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public Map<String, Object> moderate(
-            @PathVariable long id, @Valid @RequestBody ModerateReviewRequest request) {
-        ReviewResponse review = reviews.moderate(id, request.status());
-        return Map.of("id", review.id(), "status", review.moderationStatus());
+    public List<ReviewResponse> allReviews() {
+        return reviews.allReviews();
     }
 }

@@ -39,16 +39,14 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional(readOnly = true)
     public List<ReviewResponse> publicReviews(long caretakerId) {
-        return reviews
-                .findByCaretakerIdAndModerationStatusOrderByCreatedAtDesc(caretakerId, "APPROVED")
-                .stream()
+        return reviews.findByCaretakerIdOrderByCreatedAtDesc(caretakerId).stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewResponse> allForModeration() {
+    public List<ReviewResponse> allReviews() {
         return reviews.findAllByOrderByCreatedAtDesc().stream().map(this::toResponse).toList();
     }
 
@@ -87,24 +85,15 @@ public class ReviewServiceImpl implements ReviewService {
         return toResponse(review);
     }
 
-    @Override
-    @Transactional
-    public ReviewResponse moderate(long reviewId, String status) {
-        Review review =
-                reviews.findById(reviewId)
-                        .orElseThrow(() -> new NotFoundException("Review not found."));
-        review.moderate(status);
-        auditLogs.save(new AuditLog(null, "REVIEW_" + status, "REVIEW", reviewId));
-        return toResponse(review);
-    }
-
     private ReviewResponse toResponse(Review review) {
         return new ReviewResponse(
                 review.getId(),
                 review.getRating(),
                 review.getComment(),
-                review.getModerationStatus(),
                 review.getBooking().getId(),
+                review.getCaretaker().getId(),
+                review.getBooking().getPet().getId(),
+                review.getBooking().getPet().getName(),
                 review.getAuthor().getName(),
                 review.getCaretaker().getName(),
                 review.getCreatedAt());
