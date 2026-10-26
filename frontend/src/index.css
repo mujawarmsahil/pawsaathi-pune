@@ -2563,14 +2563,6 @@ button:disabled {
   background: #e8f2e7;
   color: #376a40;
 }
-.status-pill.status-pending {
-  background: #fff0d9;
-  color: #805921;
-}
-.status-pill.status-rejected {
-  background: #fae9e5;
-  color: #93442f;
-}
 
 @media (max-width: 760px) {
   .admin-shell {
