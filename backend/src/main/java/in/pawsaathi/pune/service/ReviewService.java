@@ -8,9 +8,7 @@ import java.util.List;
 public interface ReviewService {
     List<ReviewResponse> publicReviews(long caretakerId);
 
-    List<ReviewResponse> allForModeration();
+    List<ReviewResponse> allReviews();
 
     ReviewResponse create(long customerId, CreateReviewRequest request);
-
-    ReviewResponse moderate(long reviewId, String status);
 }

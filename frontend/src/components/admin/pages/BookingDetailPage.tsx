@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { CalendarDays, Mail, MapPin, PawPrint, Phone } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useLocation, useParams } from 'react-router-dom';
 
 import { endpoints } from '../../../api/endpoints';
 import {
@@ -17,12 +18,17 @@ import { StatusBadge } from '../../common/ui/StatusBadge';
 
 export function BookingDetailPage() {
   const { id } = useParams();
+  const { hash } = useLocation();
   const bookingId = Number(id);
   const bookingDetailQuery = useQuery({
     queryKey: ['admin', 'booking', bookingId],
     queryFn: () => endpoints.admin.bookingDetail(bookingId),
     enabled: Number.isFinite(bookingId),
   });
+  useEffect(() => {
+    if (!hash || bookingDetailQuery.isPending) return;
+    document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
+  }, [bookingDetailQuery.isPending, hash]);
   if (!Number.isFinite(bookingId))
     return (
       <EmptyState
@@ -66,7 +72,7 @@ export function BookingDetailPage() {
         </div>
         <div className="admin-booking-detail-content">
           <div className="admin-booking-detail-main">
-            <section className="admin-profile-section">
+            <section className="admin-profile-section" id="customer">
               <h2>Customer</h2>
               <div className="admin-booking-person">
                 <ProfileImage
@@ -90,7 +96,7 @@ export function BookingDetailPage() {
                 </div>
               </div>
             </section>
-            <section className="admin-profile-section">
+            <section className="admin-profile-section" id="pet">
               <h2>Pet</h2>
               <div className="admin-booking-person">
                 {bookingDetail.pet.photoUrl ? (
@@ -197,7 +203,7 @@ export function BookingDetailPage() {
                 <p className="admin-muted">No payment recorded for this booking.</p>
               )}
             </section>
-            <section>
+            <section id="caretaker">
               <h2>Caretaker</h2>
               <div className="admin-booking-person-copy">
                 <b>{bookingDetail.caretaker.name}</b>
