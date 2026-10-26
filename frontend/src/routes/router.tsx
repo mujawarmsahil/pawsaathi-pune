@@ -9,11 +9,14 @@ import { PublicLayout } from '../components/layout/PublicLayout';
 import {
   AdminCaretakerDetailPage,
   AdminCaretakersPage,
+  AdminCustomerDetailPage,
+  AdminCustomersPage,
   AdminOverviewPage,
   AdminProfilePage,
   AdminResourcePage,
   AdminReviewsPage,
   AdminSupportPage,
+  BookingDetailPage as AdminBookingDetailPage,
   BookingsPage,
 } from '../pages/admin/AdminPages';
 import { LoginPage, PasswordChangePage, RegisterPage } from '../pages/auth/AuthPages';
@@ -24,7 +27,7 @@ import {
   CaretakerProfileEditorPage,
 } from '../pages/caretaker/CaretakerPages';
 import {
-  BookingDetailPage,
+  BookingDetailPage as CustomerBookingDetailPage,
   CustomerBookingsPage,
   CustomerProfilePage,
   NotificationsPage,
@@ -67,7 +70,7 @@ export const router = createBrowserRouter([
                 element: <AppLayout />,
                 children: [
                   { path: '/app/bookings', element: <CustomerBookingsPage /> },
-                  { path: '/app/bookings/:id', element: <BookingDetailPage /> },
+                  { path: '/app/bookings/:id', element: <CustomerBookingDetailPage /> },
                   { path: '/app/notifications', element: <NotificationsPage /> },
                   { path: '/app/pets', element: <PetsPage /> },
                   { path: '/app/profile', element: <CustomerProfilePage /> },
@@ -97,9 +100,11 @@ export const router = createBrowserRouter([
                 element: <AdminLayout />,
                 children: [
                   { path: '/admin', element: <AdminOverviewPage /> },
+                  { path: '/admin/customers', element: <AdminCustomersPage /> },
+                  { path: '/admin/customers/:id', element: <AdminCustomerDetailPage /> },
                   { path: '/admin/caretakers', element: <AdminCaretakersPage /> },
                   { path: '/admin/caretakers/:id', element: <AdminCaretakerDetailPage /> },
-                  { path: '/admin/bookings/:id', element: <BookingDetailPage /> },
+                  { path: '/admin/bookings/:id', element: <AdminBookingDetailPage /> },
                   { path: '/admin/reviews', element: <AdminReviewsPage /> },
                   { path: '/admin/support', element: <AdminSupportPage /> },
                   { path: '/admin/profile', element: <AdminProfilePage /> },

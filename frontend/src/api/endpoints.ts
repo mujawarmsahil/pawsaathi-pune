@@ -3,6 +3,8 @@ import type {
   AdminBookingDetail,
   AdminBookingSummary,
   AdminCaretakerDetail,
+  AdminCustomer,
+  AdminCustomerStatus,
   AdminSummary,
   ApiRecord,
   Booking,
@@ -160,6 +162,15 @@ export const endpoints = {
   },
   admin: {
     overview: () => apiRequest<AdminSummary>('/admin/overview'),
+    customers: () => apiRequest<AdminCustomer[]>('/admin/customers'),
+    customerDetail: (id: number) => apiRequest<AdminCustomer>(`/admin/customers/${id}`),
+    customerBookings: (id: number) =>
+      apiRequest<AdminBookingSummary[]>(`/admin/customers/${id}/bookings`),
+    updateCustomer: (id: number, status: string) =>
+      apiRequest<AdminCustomerStatus>(`/admin/customers/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      }),
     caretakers: () => apiRequest<CaretakerCandidate[]>('/admin/caretakers'),
     bookings: () => apiRequest<AdminBookingSummary[]>('/bookings/admin'),
     caretakerDetail: (id: number) => apiRequest<AdminCaretakerDetail>(`/admin/caretakers/${id}`),

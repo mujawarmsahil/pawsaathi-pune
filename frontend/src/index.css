@@ -1723,6 +1723,10 @@ button:disabled {
   background: #e8f2e7;
   color: #376a40;
 }
+.status-pill.status-deactivated {
+  background: #fae9e5;
+  color: #93442f;
+}
 .footer-grid small {
   display: block;
   color: #91aaa4;
@@ -2972,6 +2976,103 @@ button:disabled {
   background: var(--teal);
   color: #fff;
 }
+.admin-customer-email {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-customer-facts {
+  margin-top: 15px;
+}
+.admin-customer-pets {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #f0ebe2;
+}
+.admin-customer-pets-label {
+  margin-right: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.admin-customer-pets-empty {
+  font-size: 12px;
+}
+.admin-customer-card-footer {
+  justify-content: flex-end;
+}
+.admin-customer-actions .button {
+  padding: 9px 12px;
+  font-size: 12px;
+}
+.admin-customer-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.admin-customer-pet-list {
+  display: grid;
+  gap: 11px;
+}
+.admin-customer-pet {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: #fcfaf5;
+  scroll-margin-top: 90px;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+.admin-customer-pet:target {
+  border-color: #e7bd8b;
+  background: #fffaf2;
+  box-shadow: 0 0 0 3px #f3d7b9;
+}
+.admin-customer-pet-copy {
+  display: grid;
+  flex: 1;
+  gap: 8px;
+  min-width: 0;
+}
+.admin-customer-pet-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+.admin-customer-pet-head h3 {
+  margin: 0;
+  color: var(--teal);
+  font-size: 16px;
+}
+.admin-customer-pet-head span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+.admin-customer-pet-copy p {
+  margin: 0;
+  color: #526260;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.admin-customer-pet-copy p b {
+  color: var(--teal);
+}
 .admin-review-skeleton {
   display: grid;
   gap: 10px;
@@ -2997,6 +3098,13 @@ button:disabled {
   }
   .admin-review-booking {
     align-self: flex-start;
+  }
+  .admin-customer-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .admin-customer-pet {
+    flex-direction: column;
   }
 }
 .admin-profile-side {
@@ -3425,7 +3533,10 @@ button:disabled {
   gap: 2px;
   min-width: 0;
 }
-.admin-booking-row-date b,
+.admin-booking-row-date b {
+  color: var(--teal);
+  font-size: 11px;
+}
 .admin-booking-row-main b {
   color: var(--teal);
   font-size: 13px;

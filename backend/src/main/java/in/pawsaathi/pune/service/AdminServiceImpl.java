@@ -130,6 +130,14 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<AdminBookingSummaryResponse> customerBookings(long customerId) {
+        users.findAdminCustomerById(customerId)
+                .orElseThrow(() -> new NotFoundException("Customer not found."));
+        return summaries(bookings.findByCustomerIdOrderByStartsAtDesc(customerId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public AdminBookingDetailResponse bookingDetail(long bookingId) {
         Booking booking =
                 bookings.findById(bookingId)
