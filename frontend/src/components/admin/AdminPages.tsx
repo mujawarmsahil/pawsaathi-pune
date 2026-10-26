@@ -1,6 +1,8 @@
 export { AccountProfilePage as AdminProfilePage } from '../account/AccountProfilePage';
 export { AdminCaretakerDetailPage } from './pages/AdminCaretakerDetailPage';
 export { AdminCaretakersPage } from './pages/AdminCaretakersPage';
+export { AdminCustomerDetailPage } from './pages/AdminCustomerDetailPage';
+export { AdminCustomersPage } from './pages/AdminCustomersPage';
 export { AdminOverviewPage } from './pages/AdminOverviewPage';
 export { AdminResourcePage } from './pages/AdminResourcePage';
 export { AdminReviewsPage } from './pages/AdminReviewsPage';

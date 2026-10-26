@@ -95,6 +95,9 @@ export function BookingDetailPage() {
                   )}
                 </div>
               </div>
+              <Link className="text-link" to={`/admin/customers/${bookingDetail.customer.id}`}>
+                View customer profile
+              </Link>
             </section>
             <section className="admin-profile-section" id="pet">
               <h2>Pet</h2>

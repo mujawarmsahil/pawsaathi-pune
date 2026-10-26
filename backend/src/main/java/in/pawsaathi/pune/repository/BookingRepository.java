@@ -25,6 +25,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByOrderByCreatedAtDesc();
 
+    @Query(
+            """
+            SELECT b FROM Booking b
+            WHERE b.customer.id IN :customerIds
+              AND b.location IS NOT NULL AND TRIM(b.location) <> ''
+            ORDER BY b.startsAt DESC
+            """)
+    List<Booking> findCustomerLocations(
+            @Param("customerIds") List<Long> customerIds);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT b FROM Booking b WHERE b.id=:id")
     Optional<Booking> findLockedById(@Param("id") long id);

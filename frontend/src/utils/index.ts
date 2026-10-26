@@ -27,6 +27,22 @@ export function getCaretakerDecisionMessage(status: string) {
   return { title: 'Caretaker updated', message: 'was updated successfully.' };
 }
 
+export function getCustomerStatusMessage(status: string) {
+  if (status === 'ACTIVE') {
+    return {
+      title: 'Customer activated',
+      message: 'can sign in and book services again.',
+    };
+  }
+  if (status === 'DEACTIVATED') {
+    return {
+      title: 'Customer deactivated',
+      message: 'can no longer sign in or book services.',
+    };
+  }
+  return { title: 'Customer updated', message: 'was updated successfully.' };
+}
+
 export function getCaretakerDetailActions(status: string) {
   if (status === 'PENDING') {
     return [

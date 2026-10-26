@@ -19,6 +19,7 @@ import in.pawsaathi.pune.entity.Review;
 import in.pawsaathi.pune.entity.ServiceCatalogItem;
 import in.pawsaathi.pune.entity.SupportTicketStatus;
 import in.pawsaathi.pune.exception.BadRequestException;
+import in.pawsaathi.pune.exception.NotFoundException;
 import in.pawsaathi.pune.repository.AdminActionRepository;
 import in.pawsaathi.pune.repository.AuditLogRepository;
 import in.pawsaathi.pune.repository.BookingRepository;
@@ -153,6 +154,33 @@ class AdminServiceImplTest {
     }
 
     @Test
+    void customerBookingsIncludeHistoryForExistingCustomer() {
+        UserRepository users = mock(UserRepository.class);
+        BookingRepository bookings = mock(BookingRepository.class);
+        AdminServiceImpl service = service(users, bookings);
+
+        Booking booking = booking();
+        when(users.findAdminCustomerById(3L)).thenReturn(Optional.of(mock(AppUser.class)));
+        when(bookings.findByCustomerIdOrderByStartsAtDesc(3L)).thenReturn(List.of(booking));
+
+        var summaries = service.customerBookings(3L);
+
+        assertEquals(1, summaries.size());
+        assertEquals("Riya Deshmukh", summaries.getFirst().customerName());
+        assertEquals("Priya Joshi", summaries.getFirst().caretakerName());
+    }
+
+    @Test
+    void customerBookingsRejectUnknownCustomer() {
+        UserRepository users = mock(UserRepository.class);
+        AdminServiceImpl service = service(users, mock(BookingRepository.class));
+
+        when(users.findAdminCustomerById(404L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> service.customerBookings(404L));
+    }
+
+    @Test
     void caretakerBookingsRejectPendingCaretakers() {
         CaretakerProfileRepository profiles = mock(CaretakerProfileRepository.class);
         BookingRepository bookings = mock(BookingRepository.class);
@@ -225,8 +253,26 @@ class AdminServiceImplTest {
             BookingRepository bookings,
             PaymentRepository payments,
             ReviewRepository reviews) {
+        return service(mock(UserRepository.class), profiles, bookings, payments, reviews);
+    }
+
+    private AdminServiceImpl service(UserRepository users, BookingRepository bookings) {
+        return service(
+                users,
+                mock(CaretakerProfileRepository.class),
+                bookings,
+                mock(PaymentRepository.class),
+                mock(ReviewRepository.class));
+    }
+
+    private AdminServiceImpl service(
+            UserRepository users,
+            CaretakerProfileRepository profiles,
+            BookingRepository bookings,
+            PaymentRepository payments,
+            ReviewRepository reviews) {
         return new AdminServiceImpl(
-                mock(UserRepository.class),
+                users,
                 profiles,
                 mock(CaretakerQueryRepository.class),
                 bookings,

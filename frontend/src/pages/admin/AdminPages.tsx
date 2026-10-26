@@ -1,6 +1,8 @@
 export {
   AdminCaretakerDetailPage,
   AdminCaretakersPage,
+  AdminCustomerDetailPage,
+  AdminCustomersPage,
   AdminOverviewPage,
   AdminProfilePage,
   AdminResourcePage,

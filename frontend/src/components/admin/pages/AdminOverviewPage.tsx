@@ -40,6 +40,7 @@ export function AdminOverviewPage() {
         <h2>Manage the platform</h2>
         <div className="admin-shortcuts">
           {[
+            ['Customers', '/admin/customers'],
             ['Caretakers', '/admin/caretakers'],
             ['Reviews', '/admin/reviews'],
             ['Support', '/admin/support'],
