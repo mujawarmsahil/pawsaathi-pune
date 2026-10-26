@@ -251,7 +251,7 @@ export function AdminCaretakerDetailPage() {
               <p className="admin-rating-line">
                 <Star size={16} fill="currentColor" /> {displayRating}
                 <span>
-                  {caretaker.reviewCount} approved review{caretaker.reviewCount === 1 ? '' : 's'}
+                  {caretaker.reviewCount} review{caretaker.reviewCount === 1 ? '' : 's'}
                 </span>
               </p>
               {caretaker.reviews.length === 0 ? (
@@ -265,7 +265,6 @@ export function AdminCaretakerDetailPage() {
                         <span>
                           {review.rating}/5 <Star size={13} fill="currentColor" />
                         </span>
-                        <StatusBadge status={review.moderationStatus} />
                       </div>
                       <p>{review.comment || 'No comment provided.'}</p>
                       <small>{formatAdminDate(review.createdAt)}</small>
@@ -303,7 +302,7 @@ export function AdminCaretakerDetailPage() {
                 <dd>{caretaker.languages || 'Not provided'}</dd>
               </div>
               <div>
-                <dt>Approved rating</dt>
+                <dt>Average rating</dt>
                 <dd>{displayRating === 'New' ? 'No reviews yet' : `${displayRating} / 5`}</dd>
               </div>
               <div>

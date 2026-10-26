@@ -6,8 +6,10 @@ public record ReviewResponse(
         long id,
         int rating,
         String comment,
-        String moderationStatus,
         long bookingId,
+        long caretakerId,
+        long petId,
+        String petName,
         String author,
         String caretaker,
         Instant createdAt) {}

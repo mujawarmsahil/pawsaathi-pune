@@ -149,7 +149,10 @@ export const endpoints = {
   },
   reviews: {
     create: (body: ApiRecord) =>
-      apiRequest<Review>('/reviews', { method: 'POST', body: JSON.stringify(body) }),
+      apiRequest<{ submitted: string }>('/reviews', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
   },
   notifications: {
     list: () => apiRequest<Notification[]>('/notifications'),
@@ -169,11 +172,6 @@ export const endpoints = {
         body: JSON.stringify({ status }),
       }),
     reviews: () => apiRequest<Review[]>('/admin/reviews'),
-    moderateReview: (id: number, status: string) =>
-      apiRequest<void>(`/admin/reviews/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status }),
-      }),
     supportTickets: () => apiRequest<SupportTicket[]>('/support/tickets'),
   },
 };
