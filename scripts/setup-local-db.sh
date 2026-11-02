@@ -2,19 +2,20 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BACKEND_ENV="$ROOT_DIR/backend/.env"
 
-if [[ ! -f "$ROOT_DIR/.env" ]]; then
-  echo "Missing .env. Copy .env.example to .env and configure it first." >&2
+if [[ ! -f "$BACKEND_ENV" ]]; then
+  echo "Missing backend/.env. Copy backend/.env.example to backend/.env and configure it first." >&2
   exit 1
 fi
 
 set -a
-. "$ROOT_DIR/.env"
+. "$BACKEND_ENV"
 set +a
 
-: "${DB_URL:?DB_URL is required in .env}"
-: "${DB_USERNAME:?DB_USERNAME is required in .env}"
-: "${DB_PASSWORD:?DB_PASSWORD is required in .env}"
+: "${DB_URL:?DB_URL is required in backend/.env}"
+: "${DB_USERNAME:?DB_USERNAME is required in backend/.env}"
+: "${DB_PASSWORD:?DB_PASSWORD is required in backend/.env}"
 
 DB_NAME="${DB_URL##*/}"
 DB_NAME="${DB_NAME%%\?*}"

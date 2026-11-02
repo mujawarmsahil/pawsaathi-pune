@@ -2,18 +2,19 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BACKEND_ENV="$ROOT_DIR/backend/.env"
 
-if [[ ! -f "$ROOT_DIR/.env" ]]; then
-  echo "Missing .env. Copy .env.example to .env and configure it first." >&2
+if [[ ! -f "$BACKEND_ENV" ]]; then
+  echo "Missing backend/.env. Copy backend/.env.example to backend/.env and configure it first." >&2
   exit 1
 fi
 
 set -a
-. "$ROOT_DIR/.env"
+. "$BACKEND_ENV"
 set +a
 
 if [[ -z "${JWT_SECRET:-}" || "${#JWT_SECRET}" -lt 32 ]]; then
-  echo "JWT_SECRET in .env must be at least 32 characters." >&2
+  echo "JWT_SECRET in backend/.env must be at least 32 characters." >&2
   exit 1
 fi
 

@@ -4,13 +4,13 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-if [[ ! -f .env ]]; then
-  echo "Create .env from .env.example and configure the local MySQL connection first." >&2
+if [[ ! -f backend/.env ]]; then
+  echo "Create backend/.env from backend/.env.example and configure the local MySQL connection first." >&2
   exit 1
 fi
 
 set -a
-. ./.env
+. ./backend/.env
 set +a
 
 if [[ "${SPRING_PROFILES_ACTIVE:-dev}" == "prod" ]]; then
@@ -35,8 +35,8 @@ if [[ "$ready" != 1 ]]; then
   exit 1
 fi
 
-MYSQL_PWD="${DB_PASSWORD:?Set DB_PASSWORD in .env}" mysql --protocol=tcp \
-  -h 127.0.0.1 -u "${DB_USERNAME:?Set DB_USERNAME in .env}" pawsaathi_pune_phase0 \
+MYSQL_PWD="${DB_PASSWORD:?Set DB_PASSWORD in backend/.env}" mysql --protocol=tcp \
+  -h 127.0.0.1 -u "${DB_USERNAME:?Set DB_USERNAME in backend/.env}" pawsaathi_pune_phase0 \
   < backend/src/test/resources/phase0-e2e-seed.sql
 
 cd frontend

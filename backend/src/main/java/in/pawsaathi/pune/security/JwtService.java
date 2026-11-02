@@ -25,8 +25,8 @@ public class JwtService {
                 secret == null ? new byte[0] : secret.getBytes(StandardCharsets.UTF_8);
         if (secretBytes.length < 32) {
             throw new IllegalStateException(
-                    "JWT_SECRET must be at least 32 bytes (256 bits). Load the project .env file"
-                            + " before starting the API.");
+                    "JWT_SECRET must be at least 32 bytes (256 bits). Load backend/.env before"
+                            + " starting the API, for example with ./scripts/run-backend.sh.");
         }
         key = Keys.hmacShaKeyFor(secretBytes);
         accessTokenMinutes = properties.jwt().accessTokenMinutes();

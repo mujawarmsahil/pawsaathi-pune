@@ -5,7 +5,7 @@ services:
     environment:
       MYSQL_DATABASE: pawsaathi_pune
       MYSQL_ROOT_HOST: "%"
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in backend/.env}
     volumes:
       - pawsaathi_mysql:/var/lib/mysql
     healthcheck:
@@ -18,9 +18,9 @@ services:
     restart: unless-stopped
     environment:
       DB_URL: jdbc:mysql://mysql:3306/pawsaathi_pune?serverTimezone=Asia/Kolkata
-      DB_USERNAME: ${DB_USERNAME:?Set DB_USERNAME in .env}
-      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
-      JWT_SECRET: ${JWT_SECRET:?Set a long JWT_SECRET in .env}
+      DB_USERNAME: ${DB_USERNAME:?Set DB_USERNAME in backend/.env}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in backend/.env}
+      JWT_SECRET: ${JWT_SECRET:?Set a long JWT_SECRET in backend/.env}
       RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
       RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
       RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET:-}
