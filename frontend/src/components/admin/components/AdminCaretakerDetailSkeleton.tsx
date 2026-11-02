@@ -1,3 +1,4 @@
+import './AdminCaretakerDetailSkeleton.css';
 export function AdminCaretakerDetailSkeleton() {
   return (
     <div

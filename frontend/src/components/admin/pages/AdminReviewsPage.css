@@ -1,0 +1,53 @@
+.admin-review-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border: 1px solid #f2ddc5;
+  border-radius: 999px;
+  background: #fdf2e4;
+  color: #b56a22;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.admin-review-comment {
+  margin: 15px 0 17px;
+  color: #435451;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.admin-review-booking {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 11px;
+  border-radius: 8px;
+  background: #edf4ef;
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  transition:
+    background 150ms ease,
+    color 150ms ease;
+}
+.admin-review-booking:hover {
+  background: var(--teal);
+  color: #fff;
+}
+.admin-review-skeleton {
+  display: grid;
+  gap: 10px;
+  pointer-events: none;
+}
+.admin-review-skeleton:hover {
+  transform: none;
+  box-shadow: 0 4px 16px rgba(13, 79, 74, 0.035);
+}
+
+@media (max-width: 760px) {
+  .admin-review-booking {
+    align-self: flex-start;
+  }
+}

@@ -1,3 +1,5 @@
+import './AppLayout.css';
+
 import { LogOut, PawPrint } from 'lucide-react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 

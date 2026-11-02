@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface PetRepository extends JpaRepository<Pet, Long> {
     List<Pet> findByOwnerIdAndDeletedAtIsNullOrderByCreatedAtDesc(Long ownerId);
 
+    List<Pet> findByOwnerIdInAndDeletedAtIsNullOrderByName(List<Long> ownerIds);
+
     Optional<Pet> findByIdAndOwnerIdAndDeletedAtIsNull(Long id, Long ownerId);
 }

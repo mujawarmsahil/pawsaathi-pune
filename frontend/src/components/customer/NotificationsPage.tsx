@@ -1,3 +1,5 @@
+import './NotificationsPage.css';
+
 import { useMarkNotificationRead, useNotifications } from '../../hooks/useNotifications';
 import { formatDateTime } from '../../utils';
 import { EmptyState, ErrorState, LoadingState } from '../common/feedback/FeedbackStates';

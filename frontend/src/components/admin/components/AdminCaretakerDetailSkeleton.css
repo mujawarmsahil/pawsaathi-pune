@@ -1,0 +1,129 @@
+.admin-profile-skeleton {
+  min-height: 560px;
+}
+.admin-profile-skeleton-banner {
+  min-height: 174px;
+  padding: 30px 34px;
+  display: grid;
+  align-content: end;
+  gap: 11px;
+  background:
+    radial-gradient(circle at 14% 18%, #e68a3626, transparent 28%),
+    linear-gradient(135deg, #0d4f4a, #14655b 56%, #093f3b);
+}
+.admin-skeleton-kicker,
+.admin-skeleton-title {
+  border-radius: 5px;
+  background: linear-gradient(100deg, #ffffff1a 20%, #ffffff4d 40%, #ffffff1a 60%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.admin-skeleton-kicker {
+  width: 112px;
+  height: 11px;
+}
+.admin-skeleton-title {
+  width: 250px;
+  max-width: 65%;
+  height: 36px;
+}
+.admin-profile-skeleton-head {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: -48px;
+  padding: 0 34px 26px;
+}
+.admin-profile-skeleton-avatar {
+  width: 104px;
+  height: 104px;
+  flex: 0 0 104px;
+  border: 5px solid var(--paper);
+  border-radius: 50%;
+}
+.admin-profile-skeleton-copy {
+  flex: 1;
+  display: grid;
+  gap: 12px;
+  padding-top: 81px;
+}
+.admin-skeleton-bar,
+.admin-skeleton-heading,
+.admin-skeleton-card,
+.admin-profile-skeleton-side {
+  display: block;
+  border-radius: 7px;
+}
+.admin-skeleton-bar {
+  height: 12px;
+}
+.admin-skeleton-bar.short {
+  width: 132px;
+  max-width: 50%;
+}
+.admin-skeleton-bar.medium {
+  width: 230px;
+  max-width: 70%;
+}
+.admin-skeleton-bar.full {
+  width: 100%;
+}
+.admin-skeleton-bar.wide {
+  width: 82%;
+}
+.admin-profile-skeleton-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 34px;
+  padding: 28px 34px 34px;
+  border-top: 1px solid var(--line);
+}
+.admin-profile-skeleton-main {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+.admin-skeleton-heading {
+  width: 150px;
+  height: 19px;
+  margin-top: 12px;
+}
+.admin-skeleton-card {
+  height: 76px;
+  margin-top: 2px;
+}
+.admin-profile-skeleton-side {
+  height: 280px;
+  align-self: start;
+}
+
+@media (max-width: 900px) {
+  .admin-profile-skeleton-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-profile-skeleton-banner {
+    min-height: 145px;
+    padding: 26px 22px;
+  }
+  .admin-profile-skeleton-head {
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 0 22px 22px;
+  }
+  .admin-profile-skeleton-avatar {
+    width: 84px;
+    height: 84px;
+    flex-basis: 84px;
+  }
+  .admin-profile-skeleton-copy {
+    flex-basis: 100%;
+    padding-top: 0;
+  }
+  .admin-profile-skeleton-content {
+    padding: 24px 22px 27px;
+  }
+}

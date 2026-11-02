@@ -1,3 +1,5 @@
+import './SupportPage.css';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';

@@ -1,3 +1,5 @@
+import './BookingCard.css';
+
 import { ArrowRight, CalendarDays, ChevronDown, Mail, PawPrint, Phone } from 'lucide-react';
 import { type ReactNode, useId, useState } from 'react';
 import { Link } from 'react-router-dom';

@@ -1,3 +1,5 @@
+import './CustomerBookingsPage.css';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';

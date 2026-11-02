@@ -1,3 +1,5 @@
+import './ToastProvider.css';
+
 import { BellRing, CircleAlert, CircleCheck, Info, TriangleAlert, X } from 'lucide-react';
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';

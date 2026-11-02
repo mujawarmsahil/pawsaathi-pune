@@ -1,3 +1,5 @@
+import './ProfileImage.css';
+
 import { useState } from 'react';
 
 type ProfileImageProps = {

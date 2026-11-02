@@ -1,3 +1,5 @@
+import './SiteHeader.css';
+
 import { ArrowRight, Menu, PawPrint, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';

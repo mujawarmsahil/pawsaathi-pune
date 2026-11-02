@@ -1,3 +1,5 @@
+import './BookingDetailPage.css';
+
 import { useQuery } from '@tanstack/react-query';
 import { CalendarDays, Mail, MapPin, PawPrint, Phone } from 'lucide-react';
 import { useEffect } from 'react';
@@ -95,6 +97,9 @@ export function BookingDetailPage() {
                   )}
                 </div>
               </div>
+              <Link className="text-link" to={`/admin/customers/${bookingDetail.customer.id}`}>
+                View customer profile
+              </Link>
             </section>
             <section className="admin-profile-section" id="pet">
               <h2>Pet</h2>

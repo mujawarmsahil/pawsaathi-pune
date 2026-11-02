@@ -1,0 +1,206 @@
+.admin-booking-detail {
+  margin-top: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.admin-booking-detail-hero {
+  position: relative;
+  min-height: 154px;
+  padding: 28px 34px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 15% 20%, #e68a3652, transparent 28%),
+    radial-gradient(circle at 85% 12%, #ffffff24, transparent 30%),
+    linear-gradient(135deg, #0d4f4a, #14655b 56%, #093f3b);
+}
+.admin-booking-detail-hero .eyebrow {
+  margin-bottom: 5px;
+  color: #f3c894;
+}
+.admin-booking-detail-hero h1 {
+  margin: 0 0 6px;
+  color: #fff;
+  font-size: 34px;
+  letter-spacing: -0.8px;
+}
+.admin-booking-detail-hero p:last-child {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: #d1e2dd;
+  font-size: 13px;
+}
+.admin-booking-detail-hero .status-pill {
+  margin-right: 0;
+  flex: 0 0 auto;
+}
+.admin-booking-detail-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 34px;
+  padding: 28px 34px 34px;
+}
+.admin-booking-person {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.admin-booking-person-photo {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border-radius: 50%;
+  background: #f3eadb;
+}
+.admin-booking-person-copy {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.admin-booking-person-copy b {
+  color: var(--teal);
+  font-size: 15px;
+}
+.admin-booking-person-copy p {
+  margin: 0;
+  color: var(--muted);
+}
+.admin-booking-person-copy a,
+.admin-booking-person-copy span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+.admin-booking-person-copy a:hover {
+  color: var(--saffron);
+}
+.admin-booking-pet-placeholder {
+  display: grid;
+  place-items: center;
+  background: #f3eadb;
+  color: var(--teal);
+}
+.admin-booking-schedule {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fcfaf5;
+}
+.admin-booking-schedule div {
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  border-right: 1px solid var(--line);
+}
+.admin-booking-schedule div:last-child {
+  border-right: 0;
+}
+.admin-booking-schedule span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.admin-booking-schedule b {
+  color: var(--charcoal);
+  font-size: 13px;
+}
+.admin-booking-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.admin-booking-detail-side {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fcfaf5;
+  align-self: start;
+}
+.admin-booking-detail-side > section + section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.admin-booking-detail-side h2 {
+  margin: 0 0 9px;
+  color: var(--teal);
+  font-size: 17px;
+}
+.admin-booking-detail-side > section > b {
+  color: var(--charcoal);
+  font-size: 13px;
+}
+.admin-booking-detail-side p {
+  color: #526260;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.admin-booking-detail-side .admin-facts {
+  margin-top: 14px;
+}
+.admin-booking-detail-side .text-link {
+  display: inline-block;
+  margin-top: 11px;
+}
+.admin-booking-payment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.admin-booking-payment .status-pill {
+  margin-right: 0;
+}
+.admin-booking-payment b {
+  color: var(--charcoal);
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .admin-booking-detail-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-booking-detail-hero {
+    min-height: 140px;
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 24px 22px;
+  }
+  .admin-booking-detail-hero h1 {
+    font-size: 29px;
+  }
+  .admin-booking-detail-content {
+    padding: 24px 22px 27px;
+  }
+  .admin-booking-schedule {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .admin-booking-schedule div:nth-child(2n) {
+    border-right: 0;
+  }
+  .admin-booking-schedule div:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+  .admin-booking-schedule div {
+    border-bottom: 1px solid var(--line);
+  }
+}

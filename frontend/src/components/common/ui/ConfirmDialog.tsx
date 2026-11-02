@@ -1,3 +1,5 @@
+import './ConfirmDialog.css';
+
 import { ShieldCheck } from 'lucide-react';
 import { type ReactNode, type RefObject, useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';

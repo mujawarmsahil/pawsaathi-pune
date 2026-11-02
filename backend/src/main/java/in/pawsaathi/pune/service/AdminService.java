@@ -20,6 +20,8 @@ public interface AdminService {
 
     List<AdminBookingSummaryResponse> caretakerBookings(long caretakerId);
 
+    List<AdminBookingSummaryResponse> customerBookings(long customerId);
+
     AdminBookingDetailResponse bookingDetail(long bookingId);
 
     AdminDecisionResponse reviewCaretaker(long adminId, long caretakerId, String status);

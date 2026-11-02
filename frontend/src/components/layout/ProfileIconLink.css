@@ -1,0 +1,29 @@
+.profile-icon-link {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #f3eadb;
+  transition: box-shadow 160ms ease;
+}
+.profile-icon-link:hover {
+  box-shadow: 0 0 0 3px rgba(230, 138, 54, 0.22);
+}
+.profile-icon-link.active,
+.app-nav a.profile-icon-link.active {
+  box-shadow:
+    0 0 0 2px var(--cream),
+    0 0 0 4px var(--saffron);
+}
+.profile-icon-avatar,
+.profile-icon-loading {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.profile-icon-avatar .profile-image-content {
+  border-radius: 50%;
+}

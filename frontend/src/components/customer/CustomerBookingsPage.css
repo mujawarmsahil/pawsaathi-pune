@@ -1,0 +1,8 @@
+.cancel-booking {
+  border: 0;
+  background: none;
+  color: #964d38;
+  text-decoration: underline;
+  font-size: 11px;
+  cursor: pointer;
+}

@@ -1,0 +1,43 @@
+.page-main {
+  padding-bottom: 90px;
+}
+.listing-intro {
+  padding: 72px 0 40px;
+}
+.listing-intro h1 {
+  font-size: 48px;
+}
+.listing-intro > p:last-child {
+  max-width: 520px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.results-area {
+  min-height: 360px;
+}
+.card-bottom {
+  border-top: 1px solid var(--line);
+  margin-top: 14px;
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--teal);
+}
+.card-bottom b {
+  font-size: 16px;
+}
+.card-bottom small {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.card-bottom .text-link {
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  .listing-intro h1 {
+    font-size: 38px;
+  }
+}

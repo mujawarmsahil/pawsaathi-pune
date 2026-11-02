@@ -9,12 +9,24 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findByEmail(String email);
 
     boolean existsByEmail(String email);
+
+    @Query(
+            "SELECT u FROM AppUser u"
+                    + " WHERE u.role.name='CUSTOMER' AND u.deletedAt IS NULL"
+                    + " ORDER BY u.name")
+    List<AppUser> findAdminCustomers();
+
+    @Query(
+            "SELECT u FROM AppUser u"
+                    + " WHERE u.id=:id AND u.role.name='CUSTOMER' AND u.deletedAt IS NULL")
+    Optional<AppUser> findAdminCustomerById(@Param("id") long id);
 
     @Query(
             "SELECT COUNT(u) FROM AppUser u"

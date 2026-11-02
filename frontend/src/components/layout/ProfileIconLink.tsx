@@ -1,3 +1,5 @@
+import './ProfileIconLink.css';
+
 import { useQuery } from '@tanstack/react-query';
 import { NavLink } from 'react-router-dom';
 

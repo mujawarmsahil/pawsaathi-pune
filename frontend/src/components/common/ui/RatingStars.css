@@ -1,0 +1,16 @@
+.rating-stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.rating-stars .rating-value {
+  margin-left: 6px;
+  font-size: 12px;
+  color: var(--teal);
+}
+.rating-stars svg {
+  color: #d0d8d4;
+}
+.rating-stars svg.is-filled {
+  color: #f5a623;
+}

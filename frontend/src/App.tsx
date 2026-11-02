@@ -1,5 +1,6 @@
 import { RouterProvider } from 'react-router-dom';
 
+import { ScrollProgressBar } from './components/layout/ScrollProgressBar';
 import { AuthProvider } from './context/AuthProvider';
 import { AppProviders } from './context/providers';
 import { router } from './routes/router';
@@ -15,6 +16,7 @@ function Bootstrap() {
 export default function App() {
   return (
     <AppProviders>
+      <ScrollProgressBar />
       <Bootstrap />
     </AppProviders>
   );

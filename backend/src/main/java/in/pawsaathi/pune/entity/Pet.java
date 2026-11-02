@@ -110,6 +110,10 @@ public class Pet {
         return id;
     }
 
+    public AppUser getOwner() {
+        return owner;
+    }
+
     public String getName() {
         return name;
     }

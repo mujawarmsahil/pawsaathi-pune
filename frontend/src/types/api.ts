@@ -289,6 +289,35 @@ export type Review = {
   createdAt: string;
 };
 
+export type AdminCustomerPet = {
+  id: number;
+  name: string;
+  species: string;
+  breed: string | null;
+  ageYears: number | null;
+  notes: string | null;
+  foodNotes: string | null;
+  photoUrl: string | null;
+};
+
+export type AdminCustomer = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  photoUrl: string | null;
+  status: string;
+  area: string | null;
+  registeredAt: string;
+  updatedAt: string;
+  pets: AdminCustomerPet[];
+};
+
+export type AdminCustomerStatus = {
+  id: number;
+  status: string;
+};
+
 export type AdminCaretakerSummary = {
   id: number;
   name: string;

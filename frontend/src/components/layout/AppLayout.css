@@ -1,0 +1,56 @@
+@media (max-width: 430px) {
+  .app-header .app-nav {
+    gap: 9px;
+    font-size: 10px;
+  }
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4f605e;
+}
+.app-nav a.active {
+  color: var(--saffron);
+}
+.logout-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  background: transparent;
+  color: var(--teal);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .app-header .nav-wrap {
+    height: auto;
+    min-height: 68px;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    padding: 10px 0;
+  }
+  .app-header .app-nav {
+    width: 100%;
+    gap: 12px;
+    padding-bottom: 2px;
+    overflow-x: auto;
+    font-size: 11px;
+    scrollbar-width: none;
+  }
+  .app-header .app-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .app-header .app-nav a,
+  .app-header .logout-button {
+    white-space: nowrap;
+  }
+  .app-header .logout-label {
+    display: none;
+  }
+}

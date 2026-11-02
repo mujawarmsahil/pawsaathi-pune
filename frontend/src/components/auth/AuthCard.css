@@ -1,0 +1,140 @@
+.auth-page {
+  min-height: calc(100vh - 78px);
+  display: grid;
+  place-items: center;
+  padding: 60px 20px;
+}
+.auth-card {
+  width: min(430px, 100%);
+  background: #fffdf9;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 42px;
+  text-align: center;
+  box-shadow: 0 16px 40px #21443a0d;
+}
+.large {
+  width: 48px;
+  height: 48px;
+  margin: auto;
+  font-size: 25px;
+}
+.auth-card .eyebrow {
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+.auth-card h1 {
+  font-size: 36px;
+  letter-spacing: -1.5px;
+}
+.auth-copy {
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 14px;
+}
+.auth-card form {
+  text-align: left;
+  margin: 28px 0 22px;
+}
+.auth-card label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--teal);
+  margin: 15px 0 7px;
+}
+.auth-card input,
+.auth-card select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #d9e0dc;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  color: var(--charcoal);
+}
+.auth-card button {
+  width: 100%;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+@media (max-width: 760px) {
+  .auth-card {
+    padding: 30px 23px;
+  }
+}
+
+.auth-page {
+  min-height: calc(100vh - 78px);
+  display: grid;
+  place-items: center;
+  padding: 55px 18px;
+}
+.auth-card {
+  width: min(440px, 100%);
+  text-align: left;
+}
+.auth-card > .large,
+.auth-card > .eyebrow,
+.auth-card > h1,
+.auth-card > .auth-copy {
+  text-align: center;
+}
+.auth-card h1 {
+  font-size: 38px;
+  letter-spacing: -1.5px;
+}
+.auth-card form {
+  display: grid;
+  gap: 0;
+}
+.auth-card input,
+.auth-card select,
+.auth-card textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d9e0dc;
+  border-radius: 7px;
+  background: #fff;
+  color: var(--charcoal);
+  font-size: 14px;
+}
+.auth-card label {
+  display: block;
+  margin: 14px 0 6px;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 700;
+}
+.auth-switch {
+  font-size: 13px;
+  text-align: center;
+  color: var(--muted);
+}
+.auth-switch a {
+  color: var(--teal);
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .auth-card {
+    padding: 30px 23px;
+  }
+}
+
+.form-inline-link {
+  text-align: right;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.form-inline-link a {
+  color: var(--teal);
+  font-weight: 700;
+}
+.auth-card form .form-error {
+  margin-top: 5px;
+}
+.auth-card input[aria-invalid='true'] {
+  border-color: #bb6348;
+}
