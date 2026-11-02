@@ -1,3 +1,7 @@
+import './AdminLayout.css';
+import '../admin/admin-shared.css';
+import '../admin/admin-controls.css';
+
 import { LogOut } from 'lucide-react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 

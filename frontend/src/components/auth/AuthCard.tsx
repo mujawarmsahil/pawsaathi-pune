@@ -1,3 +1,5 @@
+import './AuthCard.css';
+
 import { PawPrint } from 'lucide-react';
 import type { ReactNode } from 'react';
 

@@ -1,3 +1,5 @@
+import './BookingDetailPage.css';
+
 import { useQuery } from '@tanstack/react-query';
 import { CalendarDays, Mail, MapPin, PawPrint, Phone } from 'lucide-react';
 import { useEffect } from 'react';

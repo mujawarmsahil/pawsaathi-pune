@@ -1,0 +1,35 @@
+@media (max-width: 760px) {
+  .notification-list {
+    display: grid;
+    gap: 12px;
+  }
+  .notification-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper);
+  }
+  .notification-card h2 {
+    font-size: 19px;
+    margin: 6px 0;
+  }
+  .notification-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 760px) {
+  @media (max-width: 760px) {
+    .notification-card {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+}

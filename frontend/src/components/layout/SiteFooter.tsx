@@ -1,8 +1,10 @@
+import './SiteFooter.css';
+
 import { Link } from 'react-router-dom';
 
 export function SiteFooter() {
   return (
-    <footer>
+    <footer className="site-footer">
       <div className="container footer-grid">
         <div>
           <Link className="brand" to="/">

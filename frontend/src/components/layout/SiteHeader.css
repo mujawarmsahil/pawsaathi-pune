@@ -1,0 +1,46 @@
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 29px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4f605e;
+}
+.nav-links a:hover {
+  color: var(--saffron);
+}
+.nav-login {
+  color: var(--teal);
+}
+.menu-button {
+  display: none;
+  background: transparent;
+  border: 0;
+  color: var(--teal);
+}
+
+@media (max-width: 760px) {
+  .menu-button {
+    display: block;
+  }
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 68px;
+    left: 0;
+    right: 0;
+    background: var(--cream);
+    padding: 20px 24px 25px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-links.open {
+    display: flex;
+  }
+  .nav-links .button {
+    text-align: center;
+    justify-content: center;
+  }
+}

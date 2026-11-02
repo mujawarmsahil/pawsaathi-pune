@@ -1,3 +1,6 @@
+import './HomePage.css';
+import './service-cards.css';
+
 import { ArrowRight, Check, Heart, PawPrint, ShieldCheck, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

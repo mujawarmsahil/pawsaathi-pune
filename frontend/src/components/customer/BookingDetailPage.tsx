@@ -1,3 +1,6 @@
+import './BookingDetailPage.css';
+import '../booking/BookingCard.css';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';

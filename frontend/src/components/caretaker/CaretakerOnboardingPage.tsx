@@ -1,3 +1,5 @@
+import './CaretakerOnboardingPage.css';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { Upload } from 'lucide-react';

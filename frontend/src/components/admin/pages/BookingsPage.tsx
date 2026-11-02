@@ -1,3 +1,5 @@
+import './BookingsPage.css';
+
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 

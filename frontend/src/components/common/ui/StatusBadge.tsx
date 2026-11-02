@@ -1,3 +1,4 @@
+import './StatusBadge.css';
 export function StatusBadge({ status }: { status: string }) {
   const label = status
     .replaceAll('_', ' ')

@@ -1,3 +1,5 @@
+import './AdminReviewsPage.css';
+
 import { useQuery } from '@tanstack/react-query';
 import { ArrowUpRight, CalendarDays, PawPrint, Star, UserRound } from 'lucide-react';
 import { useMemo, useState } from 'react';

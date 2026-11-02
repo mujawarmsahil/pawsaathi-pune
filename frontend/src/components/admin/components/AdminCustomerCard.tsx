@@ -1,3 +1,5 @@
+import './AdminCustomerCard.css';
+
 import { CalendarDays, MapPin, PawPrint, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

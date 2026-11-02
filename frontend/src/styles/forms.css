@@ -1,0 +1,73 @@
+.profile-setup input,
+.profile-setup select,
+.profile-setup textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d9e0dc;
+  border-radius: 7px;
+  background: #fff;
+  color: var(--charcoal);
+  font-size: 14px;
+}
+.profile-setup label {
+  display: block;
+  margin: 14px 0 6px;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 700;
+}
+.profile-setup h2 {
+  font-size: 23px;
+}
+.profile-setup .button {
+  margin-top: 18px;
+  justify-content: center;
+}
+.profile-setup {
+  max-width: 620px;
+  padding: 26px;
+  background: #fffdf9;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.profile-setup > p {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.profile-setup form {
+  display: grid;
+}
+.profile-setup select[multiple] {
+  height: 100px;
+}
+.profile-setup .button {
+  justify-self: start;
+}
+.profile-setup input.sr-only {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+}
+.form-error {
+  display: block;
+  color: #9c401e;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.input-hint {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 7px;
+}
+.profile-setup input,
+.profile-setup textarea,
+.profile-setup select {
+  display: block;
+}
+.profile-setup .form-error {
+  margin-bottom: 7px;
+}

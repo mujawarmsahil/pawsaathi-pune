@@ -1,3 +1,5 @@
+import './RegisterPage.css';
+
 import { ArrowRight } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';

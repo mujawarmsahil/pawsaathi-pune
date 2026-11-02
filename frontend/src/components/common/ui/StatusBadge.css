@@ -1,0 +1,63 @@
+.status-pill {
+  padding: 6px 9px;
+  background: #f2eddf;
+  border-radius: 20px;
+  font-size: 10px;
+  color: #725d31;
+  font-weight: 700;
+}
+.status-pill.accepted,
+.status-pill.completed {
+  background: #e8f2e7;
+  color: #376a40;
+}
+.status-pill.rejected,
+.status-pill.cancelled {
+  background: #fae9e5;
+  color: #93442f;
+}
+.status-pill.status-active {
+  background: #e8f2e7;
+  color: #376a40;
+}
+.status-pill.status-deactivated {
+  background: #fae9e5;
+  color: #93442f;
+}
+
+@media (max-width: 430px) {
+  .status-pill {
+    margin-right: auto;
+  }
+}
+
+.status-pill.status-pending_payment,
+.status-pill.status-requested {
+  background: #fff0d9;
+  color: #805921;
+}
+.status-pill.status-in_progress {
+  background: #e7f1f3;
+  color: #2c6370;
+}
+.status-pill.status-refunded {
+  background: #e7eafa;
+  color: #455c91;
+}
+.status-pill.status-open {
+  background: #fff0d9;
+  color: #805921;
+}
+.status-pill.status-resolved,
+.status-pill.status-approved {
+  background: #e8f2e7;
+  color: #376a40;
+}
+.status-pill.status-pending {
+  background: #fff0d9;
+  color: #805921;
+}
+.status-pill.status-rejected {
+  background: #fae9e5;
+  color: #93442f;
+}
