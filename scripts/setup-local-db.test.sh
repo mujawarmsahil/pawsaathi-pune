@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/pawsaathi-setup-db-test.XXXXXX")"
 trap 'rm -rf "$TEST_DIR"' EXIT
 
-mkdir -p "$TEST_DIR/bin" "$TEST_DIR/scripts"
+mkdir -p "$TEST_DIR/bin" "$TEST_DIR/scripts" "$TEST_DIR/backend"
 cp "$ROOT_DIR/scripts/setup-local-db.sh" "$TEST_DIR/scripts/"
 
 cat > "$TEST_DIR/bin/mysql" <<'MYSQL'
@@ -26,7 +26,7 @@ check_case() {
   local password="$1"
   local expected="$2"
   local env_password="${password//\\/\\\\}"
-  printf 'DB_URL=jdbc:mysql://127.0.0.1:3306/pawsaathi_test?serverTimezone=UTC\nDB_USERNAME=root\nDB_PASSWORD="%s"\n' "$env_password" > "$TEST_DIR/.env"
+  printf 'DB_URL=jdbc:mysql://127.0.0.1:3306/pawsaathi_test?serverTimezone=UTC\nDB_USERNAME=root\nDB_PASSWORD="%s"\n' "$env_password" > "$TEST_DIR/backend/.env"
   : > "$TEST_DIR/mysql.log"
   local rc=0
   PATH="$TEST_DIR/bin:$PATH" MYSQL_LOG="$TEST_DIR/mysql.log" bash "$TEST_DIR/scripts/setup-local-db.sh" > "$TEST_DIR/output.log" 2>&1 || rc=$?

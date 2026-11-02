@@ -24,8 +24,8 @@ This is an MVP, not a production-complete service. Email/phone verification deli
 backend/                 Spring Boot API, migrations, and tests
 frontend/                React application, tests, and browser tests
 docker-compose.yml       MySQL, API, and frontend services
-.env.example             Root environment template
-frontend/.env.example    Frontend environment template
+backend/.env.example     Backend and Docker Compose environment template
+frontend/.env.example    Frontend (Vite) environment template
 ```
 
 The backend uses controller, service, repository, entity, and API model layers. The frontend keeps its application code under `frontend/src/`.
@@ -44,18 +44,18 @@ For running services locally:
 
 ## Run with Docker Compose
 
-From the repository root, create the local environment file:
+From the repository root, create the backend environment file:
 
 ```bash
-cp .env.example .env
+cp backend/.env.example backend/.env
 ```
 
-Set `DB_PASSWORD` to a strong local-only password and replace `JWT_SECRET` with a private value of at least 32 characters. Razorpay values can remain empty if you are not testing payments.
+Set `DB_PASSWORD` and `MYSQL_ROOT_PASSWORD` to strong local-only passwords and replace `JWT_SECRET` with a private value of at least 32 characters. Razorpay values can remain empty if you are not testing payments.
 
 Start the stack:
 
 ```bash
-docker compose up --build
+docker compose --env-file backend/.env up --build
 ```
 
 - Web app: <http://localhost:3000>
@@ -63,7 +63,7 @@ docker compose up --build
 - API health: <http://localhost:8080/api/health>
 - Swagger UI: <http://localhost:8080/swagger-ui.html>
 
-Flyway applies database migrations when the API starts. Stop the services with `docker compose down`; the MySQL data remains in the named `pawsaathi_mysql` volume. To remove that data as well, run `docker compose down --volumes`.
+Flyway applies database migrations when the API starts. Stop the services with `docker compose --env-file backend/.env down`; the MySQL data remains in the named `pawsaathi_mysql` volume. To remove that data as well, add `--volumes`.
 
 ## Run services locally
 
@@ -76,17 +76,17 @@ CREATE DATABASE pawsaathi_pune CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 Copy the environment templates:
 
 ```bash
-cp .env.example .env
+cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
 
-Edit `.env` with your local MySQL connection values and a private `JWT_SECRET` of at least 32 characters. The example uses the MySQL `root` user; a local user with access to `pawsaathi_pune` can be used instead.
+Edit `backend/.env` with your local MySQL connection values and a private `JWT_SECRET` of at least 32 characters. The example uses the MySQL `root` user; a local user with access to `pawsaathi_pune` can be used instead. `frontend/.env` only needs `VITE_API_BASE_URL`, which defaults to `/api`.
 
-In one terminal, load the root environment and start the API:
+In one terminal, load the backend environment and start the API:
 
 ```bash
 set -a
-source .env
+source backend/.env
 set +a
 cd backend
 mvn spring-boot:run
@@ -104,20 +104,28 @@ Vite serves the app at <http://localhost:5173> and proxies `/api` requests to th
 
 ## Environment configuration
 
-The root `.env.example` lists the supported variables:
+Environment files are separated by service.
+
+`backend/.env.example` lists the API and Docker Compose variables:
 
 | Variable | Purpose |
 | --- | --- |
 | `DB_URL` | JDBC URL for the database |
 | `DB_USERNAME`, `DB_PASSWORD` | Database credentials; required by the API and Compose setup |
+| `MYSQL_ROOT_PASSWORD` | MySQL root password used by the Compose database service |
 | `JWT_SECRET` | JWT signing secret; provide a private value of at least 32 characters |
 | `SPRING_PROFILES_ACTIVE` | Spring profile; defaults to `dev` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated frontend origins |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` | Razorpay order creation and payment verification |
 | `RAZORPAY_WEBHOOK_SECRET` | Razorpay webhook signature verification |
+
+`frontend/.env.example` lists the Vite variables:
+
+| Variable | Purpose |
+| --- | --- |
 | `VITE_API_BASE_URL` | Frontend API base URL; defaults to `/api` |
 
-Never commit `.env` files or real credentials. The frontend template currently sets `VITE_API_BASE_URL=/api`.
+Never commit `.env` files or real credentials. Use `./scripts/run-backend.sh` to load `backend/.env` before starting the API.
 
 ## API
 
