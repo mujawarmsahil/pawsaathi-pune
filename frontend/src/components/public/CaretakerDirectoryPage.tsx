@@ -1,3 +1,6 @@
+import './CaretakerDirectoryPage.css';
+import './public-pages.css';
+
 import { ArrowRight, MapPin, ShieldCheck, Star } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';

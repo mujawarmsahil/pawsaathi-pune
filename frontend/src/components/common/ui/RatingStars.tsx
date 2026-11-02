@@ -1,3 +1,5 @@
+import './RatingStars.css';
+
 import { Star } from 'lucide-react';
 
 type RatingStarsProps = {

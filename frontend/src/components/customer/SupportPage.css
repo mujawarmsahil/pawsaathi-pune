@@ -1,0 +1,32 @@
+.support-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0;
+}
+.support-card {
+  background: #fffdf9;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 18px;
+}
+.support-card h2 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+.support-card p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.support-card small {
+  display: block;
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+@media (max-width: 760px) {
+  .support-grid {
+    grid-template-columns: 1fr;
+  }
+}

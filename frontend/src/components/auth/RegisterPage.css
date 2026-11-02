@@ -1,0 +1,23 @@
+.pending-panel {
+  margin: 14px 0;
+  padding: 26px 24px;
+  border-radius: 10px;
+  background: #edf5eb;
+  color: #2e6945;
+  text-align: center;
+}
+.pending-panel strong {
+  display: block;
+  margin-bottom: 10px;
+  font: 700 22px/1.3 Manrope;
+  color: #24583b;
+}
+.pending-panel p {
+  max-width: 360px;
+  margin: 0 auto;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.pending-panel .full-button {
+  margin-top: 18px;
+}

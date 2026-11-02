@@ -1,3 +1,5 @@
+import './CaretakerProfilePage.css';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, MapPin, ShieldCheck, Star } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';

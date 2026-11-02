@@ -1,0 +1,144 @@
+.setup-page {
+  padding-top: 35px;
+  padding-bottom: 70px;
+}
+.setup-card {
+  max-width: 680px;
+  margin: 20px auto;
+  background: #fffdf9;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 38px;
+}
+.setup-card h1 {
+  font-size: 38px;
+  letter-spacing: -1.4px;
+}
+.setup-card > .auth-copy {
+  color: var(--muted);
+  line-height: 1.55;
+}
+.setup-card form {
+  display: grid;
+}
+.setup-card input:not([type='checkbox']),
+.setup-card textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d9e0dc;
+  border-radius: 7px;
+  background: #fff;
+  color: var(--charcoal);
+  font: inherit;
+  font-size: 14px;
+}
+.setup-card label,
+.setup-card legend {
+  display: block;
+  margin: 13px 0 6px;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 700;
+}
+.setup-card fieldset {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin: 19px 0 0;
+  padding: 14px;
+}
+.setup-card fieldset legend {
+  padding: 0 5px;
+}
+.setup-card .check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  font-weight: 500;
+  color: var(--charcoal);
+}
+.weekday-grid {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.setup-card .weekday-grid .check-label {
+  gap: 5px;
+}
+.setup-card .date-time {
+  margin-top: 10px;
+}
+.setup-card > .success,
+.setup-card > .alert {
+  margin-top: 20px;
+}
+
+@media (max-width: 760px) {
+  .setup-card {
+    padding: 26px 20px;
+  }
+  .weekday-grid {
+    gap: 8px;
+  }
+}
+
+.onboarding-steps {
+  display: flex;
+  gap: 14px;
+  list-style: none;
+  padding: 0;
+  margin: 22px 0;
+}
+.onboarding-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--teal);
+  font-weight: 700;
+  font-size: 12px;
+}
+.onboarding-steps li span {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  background: #f3eadb;
+  color: var(--saffron);
+  border-radius: 50%;
+}
+.setup-card fieldset {
+  margin: 20px 0 10px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.setup-card legend {
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 5px;
+}
+.setup-card .check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 9px 0;
+}
+.setup-card .check-label input {
+  width: auto;
+}
+.onboarding-check-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+@media (max-width: 760px) {
+  .onboarding-check-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .onboarding-steps {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

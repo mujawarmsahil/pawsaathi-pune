@@ -1,0 +1,50 @@
+.admin-customer-email {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-customer-facts {
+  margin-top: 15px;
+}
+.admin-customer-pets {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #f0ebe2;
+}
+.admin-customer-pets-label {
+  margin-right: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.admin-customer-pets-empty {
+  font-size: 12px;
+}
+.admin-customer-card-footer {
+  justify-content: flex-end;
+}
+.admin-customer-actions .button {
+  padding: 9px 12px;
+  font-size: 12px;
+}
+.admin-customer-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .admin-customer-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

@@ -1,3 +1,5 @@
+import './PetsPage.css';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PawPrint, Trash2, Upload } from 'lucide-react';
 import type { ChangeEvent } from 'react';

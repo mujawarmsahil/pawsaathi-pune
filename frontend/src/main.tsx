@@ -1,4 +1,6 @@
-import './index.css';
+import './styles/base.css';
+import './styles/shared.css';
+import './styles/forms.css';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
