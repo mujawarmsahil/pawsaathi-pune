@@ -22,11 +22,15 @@ public class BookingTransitionPolicy {
         }
         if ("CUSTOMER".equals(role) && actorId == customerId) {
             return next == BookingStatus.CANCELLED
-                    && (current == BookingStatus.PENDING_PAYMENT
+                    && (current == BookingStatus.REQUESTED
+                            || current == BookingStatus.PENDING_PAYMENT
                             || current == BookingStatus.CONFIRMED);
         }
         if ("CARETAKER".equals(role) && actorId == caretakerId) {
-            return current == BookingStatus.CONFIRMED
+            return current == BookingStatus.REQUESTED
+                            && (next == BookingStatus.PENDING_PAYMENT
+                                    || next == BookingStatus.REJECTED)
+                    || current == BookingStatus.CONFIRMED
                             && (next == BookingStatus.ACCEPTED || next == BookingStatus.REJECTED)
                     || current == BookingStatus.ACCEPTED
                             && (next == BookingStatus.IN_PROGRESS

@@ -173,9 +173,9 @@ class ApiContractIntegrationTest {
                             org.junit.jupiter.api.Assertions.assertTrue(
                                     booking.path("caretakerPhone").isNull());
                             org.junit.jupiter.api.Assertions.assertEquals(
-                                    "PENDING_PAYMENT", booking.path("status").asText());
+                                    "REQUESTED", booking.path("status").asText());
                             org.junit.jupiter.api.Assertions.assertEquals(
-                                    "PENDING", booking.path("paymentStatus").asText());
+                                    true, booking.path("paymentStatus").isNull());
                             org.junit.jupiter.api.Assertions.assertEquals(
                                     fixture.startsAt().toString(), booking.path("startsAt").asText());
                             org.junit.jupiter.api.Assertions.assertEquals(
@@ -201,6 +201,12 @@ class ApiContractIntegrationTest {
                         200);
         long bookingId =
                 mapper.readTree(created.getResponse().getContentAsString()).path("id").asLong();
+        mvc.perform(
+                        patch("/api/bookings/" + bookingId + "/status")
+                                .header("Authorization", "Bearer " + fixture.caretakerToken())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"status\":\"PENDING_PAYMENT\"}"))
+                .andExpect(status().isOk());
         jdbc.update(
                 "INSERT INTO payments(booking_id,amount,status) VALUES(?,399.00,'PENDING')",
                 bookingId);
@@ -265,6 +271,85 @@ class ApiContractIntegrationTest {
                             org.junit.jupiter.api.Assertions.assertTrue(
                                     booking.path("paymentStatus").isNull());
                         });
+    }
+
+    @Test
+    void bookingRequestRequiresAssignedCaretakerAcceptanceBeforePayment() throws Exception {
+        BookingFixture fixture = bookingFixture("booking-acceptance");
+        MvcResult created =
+                createBooking(
+                        fixture.customerToken(),
+                        "acceptance",
+                        bookingBody(fixture, "Awaiting caretaker"),
+                        200);
+        JsonNode request = mapper.readTree(created.getResponse().getContentAsString());
+        long bookingId = request.path("id").asLong();
+        org.junit.jupiter.api.Assertions.assertEquals("REQUESTED", request.path("status").asText());
+        org.junit.jupiter.api.Assertions.assertTrue(request.path("paymentStatus").isNull());
+
+        mvc.perform(
+                        patch("/api/bookings/" + bookingId + "/status")
+                                .header("Authorization", "Bearer " + fixture.customerToken())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"status\":\"PENDING_PAYMENT\"}"))
+                .andExpect(status().isConflict());
+        mvc.perform(
+                        patch("/api/bookings/" + bookingId + "/status")
+                                .header("Authorization", "Bearer " + fixture.caretakerToken())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"status\":\"ACCEPTED\"}"))
+                .andExpect(status().isConflict());
+
+        jdbc.update(
+                "UPDATE bookings SET created_at=DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 30 MINUTE)"
+                        + " WHERE id=?",
+                bookingId);
+        mvc.perform(
+                        patch("/api/bookings/" + bookingId + "/status")
+                                .header("Authorization", "Bearer " + fixture.caretakerToken())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"status\":\"PENDING_PAYMENT\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PENDING_PAYMENT"))
+                .andExpect(jsonPath("$.paymentStatus").value("PENDING"));
+
+        createBooking(
+                fixture.customerToken(),
+                "overlap-after-acceptance",
+                bookingBody(fixture, "Must not overlap accepted request"),
+                409);
+    }
+
+    @Test
+    void caretakerDeclinesRequestWithRequiredReason() throws Exception {
+        BookingFixture fixture = bookingFixture("booking-decline");
+        MvcResult created =
+                createBooking(
+                        fixture.customerToken(),
+                        "decline",
+                        bookingBody(fixture, "Decline test"),
+                        200);
+        long bookingId =
+                mapper.readTree(created.getResponse().getContentAsString()).path("id").asLong();
+
+        mvc.perform(
+                        patch("/api/bookings/" + bookingId + "/status")
+                                .header("Authorization", "Bearer " + fixture.caretakerToken())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"status\":\"REJECTED\"}"))
+                .andExpect(status().isBadRequest());
+
+        mvc.perform(
+                        patch("/api/bookings/" + bookingId + "/status")
+                                .header("Authorization", "Bearer " + fixture.caretakerToken())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"status\":\"REJECTED\",\"reason\":"
+                                                + "\"Schedule conflict\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("REJECTED"))
+                .andExpect(jsonPath("$.cancellationReason").value("Schedule conflict"))
+                .andExpect(jsonPath("$.paymentStatus").doesNotExist());
     }
 
     @Test
@@ -424,6 +509,7 @@ class ApiContractIntegrationTest {
         register(caretakerEmail, "CARETAKER");
         long caretakerId = emailId(caretakerEmail);
         approveCaretaker(caretakerEmail);
+        String caretakerToken = token(login(caretakerId));
         long serviceId =
                 jdbc.queryForObject("SELECT id FROM services WHERE name='Pet walking'", Long.class);
         long areaId =
@@ -458,6 +544,7 @@ class ApiContractIntegrationTest {
         long petId = mapper.readTree(pet.getResponse().getContentAsString()).path("id").asLong();
         return new BookingFixture(
                 customerToken,
+                caretakerToken,
                 caretakerId,
                 petId,
                 serviceId,
@@ -507,6 +594,7 @@ class ApiContractIntegrationTest {
 
     private record BookingFixture(
             String customerToken,
+            String caretakerToken,
             long caretakerId,
             long petId,
             long serviceId,

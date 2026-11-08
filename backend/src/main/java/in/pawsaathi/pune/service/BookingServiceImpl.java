@@ -231,9 +231,9 @@ public class BookingServiceImpl implements BookingService {
                 new BookingStatusHistory(
                         booking,
                         null,
-                        BookingStatus.PENDING_PAYMENT,
+                        BookingStatus.REQUESTED,
                         customer,
-                        "Booking request created; awaiting payment"));
+                        "Awaiting caretaker response"));
         notifications.save(
                 new Notification(
                         caretaker,

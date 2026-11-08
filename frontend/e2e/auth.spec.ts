@@ -67,13 +67,12 @@ test('customer registers, adds a pet, browses a caretaker, and requests a bookin
   await page.getByRole('button', { name: /send booking request/i }).click();
   const bookingResponse = await createdBooking;
   expect(bookingResponse.ok()).toBeTruthy();
-  expect((await bookingResponse.json()).status).toBe('PENDING_PAYMENT');
+  expect((await bookingResponse.json()).status).toBe('REQUESTED');
   await expect(page.getByRole('status')).toContainText('Booking request sent');
 
   await page.goto('/app/bookings');
-  await expect(page.getByText('Pending payment', { exact: false })).toBeVisible();
-  await page.getByRole('button', { name: /pay securely/i }).click();
-  await expect(page.getByText(/online payment service is not configured/i)).toBeVisible();
+  await expect(page.getByText('Waiting for the caretaker to respond.')).toBeVisible();
+  await expect(page.getByRole('button', { name: /pay securely/i })).toHaveCount(0);
 
   await page.getByRole('button', { name: /log out/i }).click();
   await expect(page).toHaveURL(/\/login$/);

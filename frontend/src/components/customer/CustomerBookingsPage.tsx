@@ -224,7 +224,13 @@ export function CustomerBookingsPage() {
                   {booking.status === 'PENDING_PAYMENT' && (
                     <BookingPaymentButton booking={booking} />
                   )}
-                  {['REQUESTED', 'ACCEPTED', 'CONFIRMED'].includes(booking.status) && (
+                  {booking.status === 'REQUESTED' && (
+                    <span className="muted-label">Waiting for the caretaker to respond.</span>
+                  )}
+                  {booking.status === 'ACCEPTED' && (
+                    <span className="muted-label">Your caretaker accepted this booking.</span>
+                  )}
+                  {booking.status === 'CONFIRMED' && (
                     <span className="muted-label">Rescheduling is coming soon.</span>
                   )}
                   {['PENDING_PAYMENT', 'REQUESTED', 'CONFIRMED'].includes(booking.status) && (

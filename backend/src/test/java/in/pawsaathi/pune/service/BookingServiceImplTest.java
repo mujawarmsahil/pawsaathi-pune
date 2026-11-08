@@ -53,30 +53,37 @@ class BookingServiceImplTest {
         Booking paid = booking(11L, BookingStatus.CONFIRMED);
         Booking cancelled = booking(12L, BookingStatus.CANCELLED);
         Booking awaitingPayment = booking(13L, BookingStatus.PENDING_PAYMENT);
+        Booking awaitingCaretaker = booking(14L, BookingStatus.REQUESTED);
         Payment payment = mock(Payment.class);
         BookingResponse paidResponse = mock(BookingResponse.class);
         BookingResponse cancelledResponse = mock(BookingResponse.class);
         BookingResponse awaitingPaymentResponse = mock(BookingResponse.class);
+        BookingResponse awaitingCaretakerResponse = mock(BookingResponse.class);
 
         when(bookings.findByCustomerIdOrderByStartsAtDesc(3L))
-                .thenReturn(List.of(paid, cancelled, awaitingPayment));
-        when(payments.findByBookingIdIn(List.of(11L, 12L, 13L))).thenReturn(List.of(payment));
+                .thenReturn(List.of(paid, cancelled, awaitingPayment, awaitingCaretaker));
+        when(payments.findByBookingIdIn(List.of(11L, 12L, 13L, 14L)))
+                .thenReturn(List.of(payment));
         when(payment.getBooking()).thenReturn(paid);
         when(payment.getStatus()).thenReturn(PaymentStatus.SUCCEEDED);
-        when(reviews.findByBookingIdIn(List.of(11L, 12L, 13L))).thenReturn(List.of());
+        when(reviews.findByBookingIdIn(List.of(11L, 12L, 13L, 14L))).thenReturn(List.of());
         when(responseMapper.toResponse(paid, PaymentStatus.SUCCEEDED, null)).thenReturn(paidResponse);
         when(responseMapper.toResponse(cancelled, null, null)).thenReturn(cancelledResponse);
         when(responseMapper.toResponse(awaitingPayment, PaymentStatus.PENDING, null))
                 .thenReturn(awaitingPaymentResponse);
+        when(responseMapper.toResponse(awaitingCaretaker, null, null))
+                .thenReturn(awaitingCaretakerResponse);
 
         var responses = service.list(3L, "CUSTOMER");
 
         assertEquals(
-                List.of(paidResponse, cancelledResponse, awaitingPaymentResponse), responses);
-        verify(payments).findByBookingIdIn(List.of(11L, 12L, 13L));
+                List.of(paidResponse, cancelledResponse, awaitingPaymentResponse, awaitingCaretakerResponse),
+                responses);
+        verify(payments).findByBookingIdIn(List.of(11L, 12L, 13L, 14L));
         verify(responseMapper).toResponse(paid, PaymentStatus.SUCCEEDED, null);
         verify(responseMapper).toResponse(cancelled, null, null);
         verify(responseMapper).toResponse(awaitingPayment, PaymentStatus.PENDING, null);
+        verify(responseMapper).toResponse(awaitingCaretaker, null, null);
     }
 
     @Test

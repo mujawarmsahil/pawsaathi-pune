@@ -10,6 +10,37 @@ class BookingTransitionPolicyTest {
     private final BookingTransitionPolicy policy = new BookingTransitionPolicy();
 
     @Test
+    void onlyTheAssignedCaretakerCanAcceptOrDeclineARequest() {
+        assertTrue(
+                policy.allows(
+                        20,
+                        10,
+                        20,
+                        "CARETAKER",
+                        BookingStatus.REQUESTED,
+                        BookingStatus.PENDING_PAYMENT));
+        assertTrue(
+                policy.allows(
+                        20, 10, 20, "CARETAKER", BookingStatus.REQUESTED, BookingStatus.REJECTED));
+        assertFalse(
+                policy.allows(
+                        21,
+                        10,
+                        20,
+                        "CARETAKER",
+                        BookingStatus.REQUESTED,
+                        BookingStatus.PENDING_PAYMENT));
+        assertFalse(
+                policy.allows(
+                        10,
+                        10,
+                        20,
+                        "CUSTOMER",
+                        BookingStatus.REQUESTED,
+                        BookingStatus.PENDING_PAYMENT));
+    }
+
+    @Test
     void onlyTheBookingCaretakerCanProgressTheBookingLifecycle() {
         assertTrue(
                 policy.allows(
@@ -37,6 +68,14 @@ class BookingTransitionPolicyTest {
 
     @Test
     void customersCannotChangeCaretakerStateOrCancelCompletedBookings() {
+        assertTrue(
+                policy.allows(
+                        10,
+                        10,
+                        20,
+                        "CUSTOMER",
+                        BookingStatus.REQUESTED,
+                        BookingStatus.CANCELLED));
         assertTrue(
                 policy.allows(
                         10,

@@ -98,7 +98,7 @@ public class Booking {
         this.hourlyRate = hourlyRate;
         this.location = location;
         this.notes = notes;
-        this.status = BookingStatus.PENDING_PAYMENT;
+        this.status = BookingStatus.REQUESTED;
     }
 
     public void transitionTo(BookingStatus status) {
