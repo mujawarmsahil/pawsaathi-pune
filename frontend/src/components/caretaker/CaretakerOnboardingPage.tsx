@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { endpoints } from '../../api/endpoints';
 import { useAreas, useServices } from '../../hooks/useCaretakerData';
 import { ErrorState, LoadingState } from '../common/feedback/FeedbackStates';
+import { CaretakerUnavailableDates } from './CaretakerUnavailableDates';
 
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -220,6 +221,7 @@ export function CaretakerOnboardingPage() {
           </p>
         )}
       </form>
+      <CaretakerUnavailableDates />
     </>
   );
 }

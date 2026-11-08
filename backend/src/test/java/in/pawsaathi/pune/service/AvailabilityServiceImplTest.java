@@ -16,7 +16,9 @@ import in.pawsaathi.pune.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,5 +63,30 @@ class AvailabilityServiceImplTest {
         assertEquals(2, saved);
         verify(availability).deleteByCaretakerIdAndWeekdayIsNotNull(4L);
         verify(availability).saveAll(anyList());
+    }
+
+    @Test
+    void blocksFutureDatesIdempotentlyAndAllowsUnblocking() {
+        var caretaker = new AppUser();
+        caretaker.setId(4L);
+        var date = LocalDate.now(ZoneId.of("Asia/Kolkata")).plusDays(2);
+        when(users.findById(4L)).thenReturn(Optional.of(caretaker));
+        when(availability.existsByCaretakerIdAndUnavailableDateAndAvailableFalse(4L, date))
+                .thenReturn(false, true);
+
+        service.blockDate(4L, date);
+        service.blockDate(4L, date);
+        service.unblockDate(4L, date);
+
+        verify(availability).save(org.mockito.ArgumentMatchers.any());
+        verify(availability).deleteByCaretakerIdAndUnavailableDateAndAvailableFalse(4L, date);
+    }
+
+    @Test
+    void rejectsPastUnavailableDates() {
+        var date = LocalDate.now(ZoneId.of("Asia/Kolkata")).minusDays(1);
+
+        assertThrows(BadRequestException.class, () -> service.blockDate(4L, date));
+        verifyNoInteractions(availability, users);
     }
 }

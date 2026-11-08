@@ -52,6 +52,16 @@ public class CaretakerAvailability {
         return slot;
     }
 
+    public static CaretakerAvailability blockedDate(AppUser caretaker, LocalDate date) {
+        var block = new CaretakerAvailability();
+        block.caretaker = caretaker;
+        block.startsAt = LocalTime.MIN;
+        block.endsAt = LocalTime.of(23, 59);
+        block.unavailableDate = date;
+        block.available = false;
+        return block;
+    }
+
     public Long getId() {
         return id;
     }
@@ -66,5 +76,9 @@ public class CaretakerAvailability {
 
     public LocalTime getEndsAt() {
         return endsAt;
+    }
+
+    public LocalDate getUnavailableDate() {
+        return unavailableDate;
     }
 }

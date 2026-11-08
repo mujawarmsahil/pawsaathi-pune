@@ -96,6 +96,11 @@ export const endpoints = {
         method: 'PUT',
         body: JSON.stringify(availability),
       }),
+    blockedDates: () => apiRequest<string[]>('/caretaker/availability/blocked-dates'),
+    blockDate: (date: string) =>
+      apiRequest<void>(`/caretaker/availability/blocked-dates/${date}`, { method: 'PUT' }),
+    unblockDate: (date: string) =>
+      apiRequest<void>(`/caretaker/availability/blocked-dates/${date}`, { method: 'DELETE' }),
   },
   bookings: {
     list: () => apiRequest<Booking[]>('/bookings'),

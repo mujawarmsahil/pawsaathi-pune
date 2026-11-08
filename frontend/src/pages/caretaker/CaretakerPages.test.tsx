@@ -37,7 +37,10 @@ function renderOnboarding() {
 }
 
 describe('caretaker onboarding', () => {
-  beforeEach(() => vi.restoreAllMocks());
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.spyOn(endpoints.caretakerSetup, 'blockedDates').mockResolvedValue([]);
+  });
 
   it('saves profile, services, areas, and availability from the form', async () => {
     vi.spyOn(endpoints, 'services').mockResolvedValue([
@@ -82,6 +85,43 @@ describe('caretaker onboarding', () => {
       expect.objectContaining({ weekday: 0, startsAt: '09:00', endsAt: '17:00' }),
     ]);
     expect(await screen.findByText(/Your profile and availability are saved/)).toBeInTheDocument();
+  });
+
+  it('blocks and removes one-off unavailable dates', async () => {
+    vi.spyOn(endpoints, 'services').mockResolvedValue([]);
+    vi.spyOn(endpoints, 'areas').mockResolvedValue([]);
+    const dates = new Set<string>();
+    vi.spyOn(endpoints.caretakerSetup, 'blockedDates').mockImplementation(async () =>
+      [...dates].sort(),
+    );
+    const blockDate = vi
+      .spyOn(endpoints.caretakerSetup, 'blockDate')
+      .mockImplementation(async (date) => {
+        dates.add(date);
+      });
+    const unblockDate = vi
+      .spyOn(endpoints.caretakerSetup, 'unblockDate')
+      .mockImplementation(async (date) => {
+        dates.delete(date);
+      });
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const date = [
+      tomorrow.getFullYear(),
+      String(tomorrow.getMonth() + 1).padStart(2, '0'),
+      String(tomorrow.getDate()).padStart(2, '0'),
+    ].join('-');
+
+    renderOnboarding();
+    await userEvent.type(await screen.findByLabelText('Date to block'), date);
+    await userEvent.click(screen.getByRole('button', { name: 'Block date' }));
+
+    await waitFor(() => expect(blockDate).toHaveBeenCalledWith(date, expect.anything()));
+    expect(await screen.findByText(date)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: `Remove block for ${date}` }));
+
+    await waitFor(() => expect(unblockDate).toHaveBeenCalledWith(date, expect.anything()));
+    await waitFor(() => expect(screen.queryByText(date)).not.toBeInTheDocument());
   });
 
   it('accepts a request into the payment-pending state', async () => {

@@ -72,10 +72,46 @@
 .setup-card > .alert {
   margin-top: 20px;
 }
+.blocked-dates-card h2 {
+  margin: 0;
+  color: var(--teal);
+}
+.blocked-dates-card > p {
+  line-height: 1.5;
+}
+.blocked-date-form {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+}
+.blocked-date-form .button {
+  flex: 0 0 auto;
+}
+.blocked-date-list {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 22px 0 0;
+}
+.blocked-date-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--charcoal);
+}
+.blocked-date-list .muted-label {
+  color: var(--muted);
+}
 
 @media (max-width: 760px) {
   .setup-card {
     padding: 26px 20px;
+  }
+  .blocked-date-form {
+    align-items: stretch;
+    flex-direction: column;
   }
   .weekday-grid {
     gap: 8px;
