@@ -1,8 +1,10 @@
 package in.pawsaathi.pune;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -161,6 +163,59 @@ class ApiContractIntegrationTest {
         mvc.perform(get("/api/caretakers").param("q", " "))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
+    void caretakerCanBlockAndUnblockADateToControlNewBookings() throws Exception {
+        BookingFixture fixture = bookingFixture("availability-block");
+        String date = fixture.startsAt().toLocalDate().toString();
+        String path = "/api/caretaker/availability/blocked-dates/" + date;
+
+        mvc.perform(get("/api/caretaker/availability/blocked-dates"))
+                .andExpect(status().isUnauthorized());
+        mvc.perform(
+                        get("/api/caretaker/availability/blocked-dates")
+                                .header("Authorization", "Bearer " + fixture.customerToken()))
+                .andExpect(status().isForbidden());
+
+        mvc.perform(
+                        put(path).header("Authorization", "Bearer " + fixture.caretakerToken()))
+                .andExpect(status().isNoContent());
+        mvc.perform(
+                        put(path).header("Authorization", "Bearer " + fixture.caretakerToken()))
+                .andExpect(status().isNoContent());
+        mvc.perform(
+                        get("/api/caretaker/availability/blocked-dates")
+                                .header("Authorization", "Bearer " + fixture.caretakerToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value(date))
+                .andExpect(jsonPath("$.length()").value(1));
+
+        createBooking(
+                fixture.customerToken(),
+                "availability-blocked",
+                bookingBody(fixture, "Blocked date booking"),
+                409);
+
+        String pastDate = LocalDate.now(ZoneId.of("Asia/Kolkata")).minusDays(1).toString();
+        mvc.perform(
+                        put("/api/caretaker/availability/blocked-dates/" + pastDate)
+                                .header("Authorization", "Bearer " + fixture.caretakerToken()))
+                .andExpect(status().isBadRequest());
+
+        mvc.perform(
+                        delete(path)
+                                .header("Authorization", "Bearer " + fixture.caretakerToken()))
+                .andExpect(status().isNoContent());
+        mvc.perform(
+                        delete(path)
+                                .header("Authorization", "Bearer " + fixture.caretakerToken()))
+                .andExpect(status().isNoContent());
+        createBooking(
+                fixture.customerToken(),
+                "availability-unblocked",
+                bookingBody(fixture, "Unblocked date booking"),
+                200);
     }
 
     @Test

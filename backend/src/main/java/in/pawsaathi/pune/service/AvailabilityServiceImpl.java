@@ -11,11 +11,15 @@ import in.pawsaathi.pune.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 
 @Service
 public class AvailabilityServiceImpl implements AvailabilityService {
+    private static final ZoneId SERVICE_ZONE = ZoneId.of("Asia/Kolkata");
+
     private final CaretakerAvailabilityRepository availability;
     private final UserRepository users;
 
@@ -84,5 +88,38 @@ public class AvailabilityServiceImpl implements AvailabilityService {
                                                 slot.endsAt()))
                         .toList());
         return sorted.size();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<LocalDate> listBlockedDates(long caretakerId) {
+        return availability
+                .findByCaretakerIdAndUnavailableDateIsNotNullAndAvailableFalseOrderByUnavailableDateAsc(
+                        caretakerId)
+                .stream()
+                .map(CaretakerAvailability::getUnavailableDate)
+                .distinct()
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void blockDate(long caretakerId, LocalDate date) {
+        if (date.isBefore(LocalDate.now(SERVICE_ZONE))) {
+            throw new BadRequestException("Unavailable dates must be today or in the future.");
+        }
+        var caretaker =
+                users.findById(caretakerId)
+                        .orElseThrow(() -> new NotFoundException("Caretaker not found."));
+        if (!availability.existsByCaretakerIdAndUnavailableDateAndAvailableFalse(
+                caretakerId, date)) {
+            availability.save(CaretakerAvailability.blockedDate(caretaker, date));
+        }
+    }
+
+    @Override
+    @Transactional
+    public void unblockDate(long caretakerId, LocalDate date) {
+        availability.deleteByCaretakerIdAndUnavailableDateAndAvailableFalse(caretakerId, date);
     }
 }
