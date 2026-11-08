@@ -83,6 +83,26 @@ function CaretakerBookingCard({ booking }: { booking: Booking }) {
                 </button>
               </div>
             )}
+            {booking.status === 'REQUESTED' && (
+              <div className="booking-actions">
+                <button
+                  disabled={updateStatus.isPending}
+                  onClick={() => changeBookingStatus('PENDING_PAYMENT')}
+                >
+                  Accept request
+                </button>
+                <button
+                  disabled={updateStatus.isPending}
+                  onClick={() => {
+                    setBookingStatusError('');
+                    setDeclineReason('');
+                    setDeclineDialogOpen(true);
+                  }}
+                >
+                  Decline request
+                </button>
+              </div>
+            )}
             {booking.status === 'ACCEPTED' && (
               <button
                 className="button button-small"
@@ -116,7 +136,7 @@ function CaretakerBookingCard({ booking }: { booking: Booking }) {
         description="Tell the customer why you cannot take this booking. Your reason will be shared with them and the support team."
         fieldLabel="Reason for declining"
         placeholder="Schedule conflict, outside my service area, or another reason"
-        confirmLabel="Decline booking"
+        confirmLabel={booking.status === 'REQUESTED' ? 'Decline request' : 'Decline booking'}
         cancelLabel="Keep booking"
         reason={declineReason}
         onReasonChange={setDeclineReason}

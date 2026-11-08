@@ -46,7 +46,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
               AND b.status IN :activeStatuses
               AND b.startsAt < :endsAt AND b.endsAt > :startsAt
               AND (b.status<>in.pawsaathi.pune.entity.BookingStatus.PENDING_PAYMENT
-                   OR b.createdAt >= :pendingCutoff)
+                   OR b.updatedAt > :pendingCutoff)
             """)
     boolean hasOverlappingBooking(
             @Param("caretakerId") long caretakerId,

@@ -84,6 +84,48 @@ describe('caretaker onboarding', () => {
     expect(await screen.findByText(/Your profile and availability are saved/)).toBeInTheDocument();
   });
 
+  it('accepts a request into the payment-pending state', async () => {
+    vi.spyOn(endpoints.caretakerSetup, 'profile').mockResolvedValue({
+      id: 1,
+      userId: 9,
+      bio: 'Patient and reliable local pet care.',
+      experienceYears: 3,
+      hourlyRate: 450,
+      serviceAreas: 'Aundh',
+      photoUrl: null,
+      languages: 'English',
+      serviceTypes: '',
+      approvalStatus: 'APPROVED',
+      verified: false,
+    });
+    const booking = {
+      id: 41,
+      customerId: 4,
+      caretakerId: 9,
+      petId: 12,
+      serviceId: 3,
+      status: 'REQUESTED',
+      startsAt: '2030-02-14T10:00:00Z',
+      endsAt: '2030-02-14T11:30:00Z',
+      hourlyRate: 500,
+      serviceName: 'Pet sitting',
+      petName: 'Bruno',
+      customerName: 'Riya Deshmukh',
+      caretakerName: 'Asha Rao',
+    };
+    vi.spyOn(endpoints.bookings, 'list').mockResolvedValue([booking]);
+    const updateStatus = vi
+      .spyOn(endpoints.bookings, 'updateStatus')
+      .mockResolvedValue({ ...booking, status: 'PENDING_PAYMENT' });
+
+    renderBookings();
+    await userEvent.click(await screen.findByRole('button', { name: 'Accept request' }));
+
+    await waitFor(() =>
+      expect(updateStatus).toHaveBeenCalledWith(41, 'PENDING_PAYMENT', undefined),
+    );
+  });
+
   it('requires and sends a reason when declining a booking', async () => {
     vi.spyOn(endpoints.caretakerSetup, 'profile').mockResolvedValue({
       id: 1,
@@ -104,7 +146,7 @@ describe('caretaker onboarding', () => {
       caretakerId: 9,
       petId: 12,
       serviceId: 3,
-      status: 'CONFIRMED',
+      status: 'REQUESTED',
       startsAt: '2030-02-14T10:00:00Z',
       endsAt: '2030-02-14T11:30:00Z',
       hourlyRate: 500,
@@ -119,10 +161,10 @@ describe('caretaker onboarding', () => {
       .mockResolvedValue({ ...booking, status: 'REJECTED' });
 
     renderBookings();
-    await userEvent.click(await screen.findByRole('button', { name: 'Decline' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Decline request' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Decline this booking?' });
-    const confirmButton = within(dialog).getByRole('button', { name: 'Decline booking' });
+    const confirmButton = within(dialog).getByRole('button', { name: 'Decline request' });
     expect(confirmButton).toBeDisabled();
     await userEvent.type(
       within(dialog).getByLabelText('Reason for declining'),
