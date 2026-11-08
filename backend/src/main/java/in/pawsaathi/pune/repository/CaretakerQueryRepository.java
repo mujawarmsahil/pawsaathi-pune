@@ -24,7 +24,8 @@ public class CaretakerQueryRepository {
         this.jdbc = jdbc;
     }
 
-    public List<CaretakerSummaryResponse> searchApproved(Long serviceId, String area) {
+    public List<CaretakerSummaryResponse> searchApproved(
+            Long serviceId, String area, String searchText) {
         String sql =
                 """
                 SELECT u.id,u.name,cp.bio,cp.experience_years,cp.hourly_rate,
@@ -49,6 +50,11 @@ public class CaretakerQueryRepository {
                     SELECT 1 FROM caretaker_service_areas csa
                     JOIN service_areas sa ON sa.id=csa.area_id
                     WHERE csa.caretaker_id=u.id AND LOWER(sa.name)=LOWER(?)))
+                  AND (? IS NULL OR LOCATE(LOWER(?),LOWER(u.name)) > 0 OR EXISTS(
+                    SELECT 1 FROM caretaker_service_areas csa
+                    JOIN service_areas sa ON sa.id=csa.area_id
+                    WHERE csa.caretaker_id=u.id
+                      AND LOCATE(LOWER(?),LOWER(sa.name)) > 0))
                 ORDER BY rating DESC,u.name
                 """;
         return jdbc.query(
@@ -68,7 +74,10 @@ public class CaretakerQueryRepository {
                 serviceId,
                 serviceId,
                 area,
-                area);
+                area,
+                searchText,
+                searchText,
+                searchText);
     }
 
     public Optional<CaretakerDetailResponse> findApproved(long caretakerId) {

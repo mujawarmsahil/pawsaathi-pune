@@ -51,9 +51,12 @@ public class CaretakerServiceImpl implements CaretakerService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CaretakerSummaryResponse> searchApproved(Long serviceId, String area) {
+    public List<CaretakerSummaryResponse> searchApproved(
+            Long serviceId, String area, String searchText) {
         String normalizedArea = area == null || area.isBlank() ? null : area.trim();
-        return query.searchApproved(serviceId, normalizedArea);
+        String normalizedSearchText =
+                searchText == null || searchText.isBlank() ? null : searchText.trim();
+        return query.searchApproved(serviceId, normalizedArea, normalizedSearchText);
     }
 
     @Override
