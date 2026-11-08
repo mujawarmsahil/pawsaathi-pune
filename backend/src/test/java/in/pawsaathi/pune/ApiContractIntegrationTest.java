@@ -132,6 +132,38 @@ class ApiContractIntegrationTest {
     }
 
     @Test
+    void publicCaretakerSearchMatchesNamesAndAreasWithoutReturningUnapprovedProfiles()
+            throws Exception {
+        BookingFixture fixture = bookingFixture("directory-search");
+        jdbc.update("UPDATE users SET name=? WHERE id=?", "Asha Pawar", fixture.caretakerId());
+
+        String pendingEmail = uniqueEmail("directory-search-pending");
+        register(pendingEmail, "CARETAKER");
+        jdbc.update("UPDATE users SET name=? WHERE email=?", "Asha Pending", pendingEmail);
+
+        mvc.perform(
+                        get("/api/caretakers")
+                                .param("q", "  aShA  ")
+                                .param("serviceId", Long.toString(fixture.serviceId())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value((int) fixture.caretakerId()));
+
+        mvc.perform(get("/api/caretakers").param("q", "BANER"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value((int) fixture.caretakerId()));
+
+        mvc.perform(get("/api/caretakers").param("q", "not-a-match"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+
+        mvc.perform(get("/api/caretakers").param("q", " "))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
     void adminBookingListIncludesTimeSlotAndBothPartiesContactDetails() throws Exception {
         BookingFixture fixture = bookingFixture("admin-booking-list");
         createBooking(

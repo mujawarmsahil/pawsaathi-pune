@@ -8,7 +8,7 @@ import in.pawsaathi.pune.model.CaretakerSummaryResponse;
 import java.util.List;
 
 public interface CaretakerService {
-    List<CaretakerSummaryResponse> searchApproved(Long serviceId, String area);
+    List<CaretakerSummaryResponse> searchApproved(Long serviceId, String area, String searchText);
 
     CaretakerDetailResponse getApproved(long caretakerId);
 

@@ -35,8 +35,9 @@ public class CaretakerController {
     @GetMapping("/caretakers")
     public List<CaretakerSummaryResponse> caretakers(
             @RequestParam(required = false) Long serviceId,
-            @RequestParam(required = false) String area) {
-        return caretakers.searchApproved(serviceId, area);
+            @RequestParam(required = false) String area,
+            @RequestParam(required = false) String q) {
+        return caretakers.searchApproved(serviceId, area, q);
     }
 
     @GetMapping("/caretakers/{id}")
